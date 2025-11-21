@@ -39,6 +39,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "clock.h"                                                              //
 
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
@@ -86,6 +87,7 @@ uint32_t HAL_GetTick (void) {
 static void SystemClock_Config(void);
 static void Error_Handler(void);
 
+
 /* Private functions ---------------------------------------------------------*/
 /**
   * @brief  Main program
@@ -117,16 +119,17 @@ int main(void)
   /* Initialize CMSIS-RTOS2 */
   osKernelInitialize ();
 
-  /* Create thread functions that start executing, 
-  Example: osThreadNew(app_main, NULL, NULL); */
-
+  /* Create thread functions that start executing*/
+  Init_ThClock();
   /* Start thread execution */
   osKernelStart();
+  //NO PONER NADA DEBAJO!!!!!!!!                                                //
 #endif
 
   /* Infinite loop */
   while (1)
   {
+
   }
 }
 
@@ -168,8 +171,8 @@ static void SystemClock_Config(void)
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 25;
-  RCC_OscInitStruct.PLL.PLLN = 336;
+  RCC_OscInitStruct.PLL.PLLM = 4;                                               //
+  RCC_OscInitStruct.PLL.PLLN = 168;                                             //
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 7;
   if(HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
