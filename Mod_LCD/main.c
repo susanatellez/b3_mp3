@@ -39,7 +39,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "clock.h"                                                              //
+
 
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
@@ -120,7 +120,7 @@ int main(void)
   osKernelInitialize ();
 
   /* Create thread functions that start executing*/
-  Init_ThClock();
+//  Init_ThClock();
   /* Start thread execution */
   osKernelStart();
   //NO PONER NADA DEBAJO!!!!!!!!                                                //
