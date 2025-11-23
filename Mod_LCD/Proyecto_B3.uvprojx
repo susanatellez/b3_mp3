@@ -393,6 +393,11 @@
               <FileType>1</FileType>
               <FilePath>.\stm32f4xx_it.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
             <File>
               <FileName>lcd.c</FileName>
               <FileType>1</FileType>
@@ -407,6 +412,21 @@
               <FileName>Arial12x12.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Arial12x12.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Test</GroupName>
+          <Files>
+            <File>
+              <FileName>test_lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\test_lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\test_lcd.h</FilePath>
             </File>
           </Files>
         </Group>
