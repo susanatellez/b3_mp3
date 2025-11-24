@@ -1,0 +1,5 @@
+# Archivos y carpetas de compilación que deben ser ignorados
+debugConfig/
+listings/
+objects/
+RTE/
