@@ -40,7 +40,8 @@ void initModLCD (void){
   LCD_init();
   LCD_limpiarBuffer();
   //Inicialización del hilo gestor de mensajes
-  
+  Init_ThLCD();
+  Init_MsgQueue_LCD();
 }
 //FUNCIÓNES RELATIVAS A LOS HILOS
 
@@ -56,12 +57,13 @@ int Init_ThLCD (void) {
 void LCD (void *argument){
   MsgLCD_t mensaje;
   while(1){
-    if(osMessageQueueGet(mid_MsgQueueLCD,&mensaje,NULL,osWaitForever)== osOK){
-      LCD_writeLine(mensaje.linea, mensaje.texto);
+      osMessageQueueGet(mid_MsgQueueLCD,&mensaje,NULL,osWaitForever);
+      LCD_writeLine(mensaje.linea1, mensaje.texto1);
+      LCD_writeLine(mensaje.linea2, mensaje.texto2);
       LCD_update();
-    }
-  }
+    } 
 }
+
 
 int Init_MsgQueue_LCD(void) {
  

@@ -22,12 +22,14 @@ void thTestLCD (void *argument){
   MsgLCD_t mensaje;
   
   while(1){
-  sprintf(mensaje.texto,"Linea enviada desde test");
-  mensaje.linea = 1;
-  osMessageQueuePut(mid_MsgQueueLCD, &mensaje,0,0);
-  sprintf(mensaje.texto,"Prueba de escribir otra");
-  mensaje.linea = 3;
-  osMessageQueuePut(mid_MsgQueueLCD, &mensaje,0,0);
+    mensaje.linea1 = 0;
+    sprintf(mensaje.texto1, "Linea de prueba 0");
+    mensaje.linea2 = 2;
+    sprintf(mensaje.texto2, "Hoooolaaaaaaa");
+
+    osMessageQueuePut(mid_MsgQueueLCD, &mensaje, 0, 0);
+
+
   }
 }
 

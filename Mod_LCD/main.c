@@ -40,7 +40,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#include "test_lcd.h"
 
+#include "lcd.h"
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
 #endif
@@ -120,7 +122,8 @@ int main(void)
   osKernelInitialize ();
 
   /* Create thread functions that start executing*/
-//  Init_ThClock();
+initModLCD();
+InitTestLCD();
   /* Start thread execution */
   osKernelStart();
   //NO PONER NADA DEBAJO!!!!!!!!                                                //
