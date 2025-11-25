@@ -32,7 +32,7 @@ void TimerJoy_Callback(void *arg);
 // QUEUE
 osMessageQueueId_t mid_MsgQueue_Joy;
 uint32_t sizeQueueJoy = 0;
-osStatus_t statusQueueJoy;
+osStatus_t statusQueueJoy = 0x000000000;
 uint8_t MsgQueue_Joy = 0x00;                                                    //mensaje de la cola
 int Init_MsgQueue_Joy(void);
 
@@ -105,9 +105,9 @@ void ThJoy (void *argument) {
 
     //Inicializo timer cada que llegue flag de que ha sido pulsado un botón del joystick
     if (statusJoy == 0x1000){
-      osDelay(50); //espero los primeros rebotes del rising
       statusJoy = 0x0000; //borramos el flag
       pin_activo = pin_presionado.pin; //guardamos el pin que ha sido presionado
+      osDelay(50); //espero los primeros rebotes del rising
       osTimerStart(timerJoy, 950U); //inicializamos timer de 1seg-50ms esperados antes
       
       do {
@@ -117,23 +117,23 @@ void ThJoy (void *argument) {
             osTimerStop(timerJoy); // Detener el temporizador de pulsación larga
                                    // de manera que no saltará la callback
             switch(pin_activo){ //depende del pin presionado enviamos un mensaje u otro
-              case GPIO_PIN_11:
+              case 0x0800:
                 MsgQueue_Joy = 0x02;
                 osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
                 break;
-              case GPIO_PIN_10:
+              case 0x0400:
                 MsgQueue_Joy = 0x01;
                 osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
                 break;
-              case GPIO_PIN_12:
+              case 0x1000:
                 MsgQueue_Joy = 0x03;
                 osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
                 break;
-              case GPIO_PIN_14:
+              case 0x4000:
                 MsgQueue_Joy = 0x04;
                 osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
                 break;
-              case GPIO_PIN_15:
+              case 0x8000:
                 MsgQueue_Joy = 0x05;
                 osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
                 break;

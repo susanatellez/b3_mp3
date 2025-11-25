@@ -88,7 +88,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
     pin_presionado.port = GPIOE;
   }
 
-  osThreadFlagsSet(tid_joy, 0x1000);
+  osThreadFlagsSet(tid_joy, 0x1000); //flag de que un gesto ha sifdo presionado
 
 }
 
