@@ -60,7 +60,7 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-
+extern osThreadId_t tid_joy;
 /* Private function prototypes -----------------------------------------------*/
 void EXTI15_10_IRQHandler(void);                                                //
 
@@ -87,8 +87,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
   } else {
     pin_presionado.port = GPIOE;
   }
-
-  osThreadFlagsSet(tid_joy, 0x1000); //flag de que un gesto ha sifdo presionado
+  //LEER SI ES UN FLANCO DE SUBIDA O BAJADA
+   GPIO_PinState state = HAL_GPIO_ReadPin(pin_presionado.port, pin_presionado.pin);
+  if (state == GPIO_PIN_SET) {
+    // Flanco de subida
+    osThreadFlagsSet(tid_joy, 0x1000);
+  } else {
+    // Flanco de bajada
+    osThreadFlagsSet(tid_joy, 0x0001);
+  }
+  
 
 }
 

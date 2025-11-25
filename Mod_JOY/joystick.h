@@ -7,7 +7,7 @@
 //static GPIO_InitTypeDef GPIO_InitStruct;                            //hay que borrarlo del .c
 void initModJoy (void);                                                  //este también
 
-extern osThreadId_t tid_joy;                                       //este no lo sé ahora mismo jajaj
+//extern osThreadId_t tid_joy;                                       //este no lo sé ahora mismo jajaj
 
 typedef struct {
     uint16_t pin;
@@ -15,7 +15,6 @@ typedef struct {
 } mygpio_pin;
 extern mygpio_pin pin_presionado;
 
-// Thread del test, comentar una vez este bien hecho
-int Init_Th_Joy_Test(void);
+
 
 #endif

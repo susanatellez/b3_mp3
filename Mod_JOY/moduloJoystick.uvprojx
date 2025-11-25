@@ -411,6 +411,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Test</GroupName>
+          <Files>
+            <File>
+              <FileName>test_joy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\test_joy.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_joy.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\test_joy.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>

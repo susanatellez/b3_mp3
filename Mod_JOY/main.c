@@ -40,7 +40,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "joystick.h"                                                           //
-
+#include "test_joy.h"
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
 #endif
