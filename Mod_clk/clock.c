@@ -10,8 +10,8 @@
 
 //Variables globales del reloj
 uint8_t horas = 0 ;
-uint8_t minutos = 59;
-uint8_t segundos = 40;
+uint8_t minutos = 0;
+uint8_t segundos = 0;
 
 //Hilo gestor del reloj
 osThreadId_t tid_Clock;
@@ -30,23 +30,23 @@ int Init_ThClock (void){
 }
 
 void ThClock (void *argument){
-	
-	while (1){
-			osDelay(1000);
-			if(segundos < 59){
-				segundos++;
-			}else if(minutos < 59){
-				segundos = 0;
-				minutos++;
-			}else if(horas < 23){
-				minutos = 0;
+  
+  while (1){
+      osDelay(1000);
+      if(segundos < 59){
+        segundos++;
+      }else if(minutos < 59){
         segundos = 0;
-				horas++;
-			}else{
-			  horas = 0;
+        minutos++;
+      }else if(horas < 23){
         minutos = 0;
         segundos = 0;
-			}	
-	}
-	
+        horas++;
+      }else{
+        horas = 0;
+        minutos = 0;
+        segundos = 0;
+      }
+  }
+  
 }
