@@ -58,6 +58,7 @@ void LCD (void *argument){
   MsgLCD_t mensaje;
   while(1){
       osMessageQueueGet(mid_MsgQueueLCD,&mensaje,NULL,osWaitForever);
+      LCD_limpiarBuffer();
       LCD_writeLine(mensaje.linea1, mensaje.texto1);
       LCD_writeLine(mensaje.linea2, mensaje.texto2);
       LCD_update();
@@ -148,7 +149,7 @@ void LCD_init (void){
   LCD_wr_cmd(0x40); //El display empieza en la linea 0
   LCD_wr_cmd(0xAF); //Display ON
   LCD_wr_cmd(0x81);//Contraste
-  LCD_wr_cmd(0x1F);//rellenar con contraste al gusto
+  LCD_wr_cmd(0x0F);//rellenar con contraste al gusto
   LCD_wr_cmd(0xA4); //Display all points normal
   LCD_wr_cmd(0xA6); //LCD display normal
  }
