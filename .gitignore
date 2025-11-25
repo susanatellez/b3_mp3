@@ -3,9 +3,15 @@ debugConfig/
 listings/
 objects/
 RTE/
+Mod_JOY/EventRecorderStub.scvd
+
+# para Mod_clk
+Proyecto_B3.uvguix.susan
+Proyecto_B3.uvoptx
+
+# para Mod_LCD
 
 # para Mod_JOY
-Mod_JOY/EventRecorderStub.scvd
 Mod_JOY/moduloJoystick.uvguix.susan
 Mod_JOY/moduloJoystick.uvguix.susana.tellez
 Mod_JOY/moduloJoystick.uvoptx
