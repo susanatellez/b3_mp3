@@ -108,7 +108,7 @@ void ThJoy (void *argument) {
       statusJoy = 0x0000; //borramos el flag
       pin_activo = pin_presionado.pin; //guardamos el pin que ha sido presionado
       osDelay(50); //espero los primeros rebotes del rising
-      osTimerStart(timerJoy, 950U); //inicializamos timer de 1seg-50ms esperados antes
+      osTimerStart(timerJoy, 1000U); //inicializamos timer de 1seg-50ms esperados antes
       
       do {
         if(HAL_GPIO_ReadPin(pin_presionado.port, pin_presionado.pin) == 0){//si se ha dejado de pulsar el gesto del joystick
@@ -137,16 +137,14 @@ void ThJoy (void *argument) {
                 MsgQueue_Joy = 0x05;
                 osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
                 break;
-              default:
-                //ns que poner aquí
-              break;
+              default: break;
             } //fin del switch
           // EL ELSE SOBRA??
-          } else { //si el timer ya se ha acabado la función callback del timer ya ha sido llamada = PULSACION LARGA
+          } //else { //si el timer ya se ha acabado la función callback del timer ya ha sido llamada = PULSACION LARGA
            break; //CON ESTO SALDRÍA DEL DO-WHILE CREO . . .
-          }
+          //}
           
-        }//fin del if(pin_status==0)
+        }//fin del if(si has dejado de presionar
         
       } while (1);
       
@@ -202,7 +200,7 @@ int Init_MsgQueue_Joy(void){
 }
 
 
-/* Código para testear el módulo                                                */
+/* Código para testear el módulo ***********************************************/
 
 osThreadId_t tid_Th_Joy_Test;
 //int Init_Th_Joy_Test(void);                                            //lo muevo al .H
