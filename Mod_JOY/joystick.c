@@ -3,8 +3,11 @@
 #include <stdlib.h>
 
 #include "joystick.h"                                                           //
+
 /*******************************************************************************
 MODULO JOYSTICK: encargado de detectar e identificar una pulsación en el joystick
+                 se detecta si ha sido una pulsacion corta o larga              
+                 dependiendo de cuando haya finalizado / a partir de un segundo
 ********************************************************************************/
 
 static GPIO_InitTypeDef GPIO_InitStruct;                                        //están en
@@ -24,14 +27,13 @@ void ThJoy (void *argument);
 mygpio_pin pin_presionado;
 uint16_t pin_activo;
 
-// TIMER VIRTUAL 1
+// TIMER VIRTUAL 1, GESTIONA REBOTES
 osTimerId_t timerJoyRebotes;
 int Init_timerJoyRebotes (void);
 void TimerJoyRebotes_Callback(void *arg);
 
 
-
-// TIMER VIRTUAL 2
+// TIMER VIRTUAL 2, PARA LAS PULSACIONES LARGAS
 osTimerId_t timerJoyPulsacionLarga;
 int Init_timerJoyPulsacionLarga (void);
 void TimerJoyPulsacionLarga_Callback(void *arg);
@@ -44,9 +46,7 @@ void TimerJoyRebotesBajada_Callback(void *arg);
 
 // QUEUE
 osMessageQueueId_t mid_MsgQueue_Joy;
-
-uint8_t MsgQueue_Joy = 0x00;                                                    //mensaje de la cola
-
+uint8_t MsgQueue_Joy = 0x00;                                                    //mensaje de metes a la cola
 int Init_MsgQueue_Joy(void);
 
 
@@ -59,23 +59,23 @@ int Init_MsgQueue_Joy(void);
 
 void initModJoy (void) {
 
- //Habilito reloj, configuro pines y los inicializo
-
+  //Habilito reloj, configuro pines y los inicializo
+  
   //Gestos RIGHT(PB11) y UP(PB10) del joystick
   __HAL_RCC_GPIOB_CLK_ENABLE();
   
   GPIO_InitStruct.Pin = GPIO_PIN_11 | GPIO_PIN_10;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;                           //RISING-FALLING para saber cuando empieza y acaba
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;                           //RISING-FALLING para saber...
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
+  
   //Gestos DOWN(PE12), LEFT(PE14) y CENTER(PE15) del joystick
   __HAL_RCC_GPIOE_CLK_ENABLE();
   
   GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_14 | GPIO_PIN_15;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;                           //...cuando empieza y acaba
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   
@@ -91,6 +91,7 @@ void initModJoy (void) {
   Init_timerJoyRebotes();
   Init_timerJoyPulsacionLarga();
   Init_timerJoyRebotesBajada();
+  
   //inicializo cola de mesnsajes (desde aquí envío)
   Init_MsgQueue_Joy();
 
@@ -118,23 +119,23 @@ void ThJoy (void *argument) {
     statusJoy = osThreadFlagsWait(0x1001, osFlagsWaitAny, osWaitForever);
 
     //Inicializo timer cada que llegue flag de que ha sido pulsado un botón del joystick
-    if (statusJoy == 0x1000){
-      statusJoy = 0x0000; //borramos el flag
+    
+    if (statusJoy == 0x1000){ //si es FLANCO de SUBIDA
+      statusJoy = 0x0000; //borramos flag
       pin_activo = pin_presionado.pin; //guardamos el pin que ha sido presionado
-      osTimerStart(timerJoyRebotes, 50U); //inicializamos timer de 1seg-50ms esperados antes
+      osTimerStart(timerJoyRebotes, 50U); //Iniciamos timer para gestionar rebotes
       
-      
-    } //fin del if (statusJoy == 0x1000)
-    //Espera al flag de bajada (se deja de pulsar)
-    if(statusJoy == 0x0001){
-      statusJoy = 0x0000;
-      //Inicia timer para quitar rebotes de bajada
-      osTimerStart(timerJoyRebotesBajada, 50U);
+    }
+    
+    if(statusJoy == 0x0001){ //Si es FLANCO de BAJADA
+      statusJoy = 0x0000; //borramos flag
+      osTimerStart(timerJoyRebotesBajada, 50U); //Iniciamos timer para gestionar rebotes de bajada
     }
   }
 }
 
-//inicialización del timer de rebotes
+
+//Inicialización del timer de rebotes
 int Init_timerJoyRebotes (void){
 
   timerJoyRebotes = osTimerNew(TimerJoyRebotes_Callback, osTimerOnce, NULL, NULL);
@@ -149,12 +150,13 @@ int Init_timerJoyRebotes (void){
 
 }
 
-void TimerJoyRebotes_Callback(void *arg){                                              //para REBOTES
 
-  
+void TimerJoyRebotes_Callback(void *arg){                                       //para REBOTES, flanco de subida
+
   if (HAL_GPIO_ReadPin(pin_presionado.port, pin_presionado.pin)){
     osTimerStart(timerJoyPulsacionLarga, 950U);
   }
+
 }
 
 
@@ -172,44 +174,49 @@ int Init_timerJoyRebotesBajada (void){
   return NULL;
 
 }
-void TimerJoyRebotesBajada_Callback(void *arg){                                              //para El Timer de bajada
 
+
+void TimerJoyRebotesBajada_Callback(void *arg){                                 //para el timer de BAJADA
+
+  if (HAL_GPIO_ReadPin(pin_presionado.port, pin_presionado.pin)==0){
+    if (osTimerIsRunning(timerJoyPulsacionLarga)) {
+      osTimerStop(timerJoyPulsacionLarga);
+      /* si se ha dejado de pulsar el gesto del joystick, verificamos si el
+       * temporizador sigue activo. Si es así se trata de una PULSACIÓN CORTA,
+       * por consigueinte detenemos el temporizador de pulsación larga de
+       * manera que no saltará la callback correspondiente*/
+       
+      switch(pin_activo){ //depende del pin presionado enviamos un mensaje u otro
+        case GPIO_PIN_11:
+          MsgQueue_Joy = 0x02;
+          osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
+          break;
+        case GPIO_PIN_10:
+          MsgQueue_Joy = 0x01;
+          osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
+          break;
+        case GPIO_PIN_12:
+          MsgQueue_Joy = 0x03;
+          osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
+          break;
+        case GPIO_PIN_14:
+          MsgQueue_Joy = 0x04;
+          osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
+          break;
+        case GPIO_PIN_15:
+          MsgQueue_Joy = 0x05;
+          osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
+          break;
+        default: break;
+      } //fin del switch
+      
+      //si el timer ya se ha acabado la función callback del timer ya ha sido llamada = PULSACION LARGA
+      
+    } //fin de ¿el temporizador sigue activo?
+    
+  }//fin de ¿se ha dejado de pulsar el gesto del joystick?
   
-if (HAL_GPIO_ReadPin(pin_presionado.port, pin_presionado.pin)==0){
-   if (osTimerIsRunning(timerJoyPulsacionLarga)) {
-   osTimerStop(timerJoyPulsacionLarga);
-   //si se ha dejado de pulsar el gesto del joystick
-   // Verificar si el temporizador sigue activo
-   //Si lo está se trata de una pulsación corta
-   // Detener el temporizador de pulsación larga
-   // de manera que no saltará la callback
-     switch(pin_activo){ //depende del pin presionado enviamos un mensaje u otro
-       case GPIO_PIN_11:
-         MsgQueue_Joy = 0x02;
-         osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
-         break;
-       case GPIO_PIN_10:
-         MsgQueue_Joy = 0x01;
-         osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
-         break;
-       case GPIO_PIN_12:
-         MsgQueue_Joy = 0x03;
-         osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
-         break;
-       case GPIO_PIN_14:
-         MsgQueue_Joy = 0x04;
-         osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
-         break;
-       case GPIO_PIN_15:
-         MsgQueue_Joy = 0x05;
-         osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
-         break;
-       default: break;
-     } //fin del switch
-   //si el timer ya se ha acabado la función callback del timer ya ha sido llamada = PULSACION LARGA
-   }//fin del if(pin_status==0)
- }
-}
+} //fin de la callback
 
 
 //Timer de 1s para ver si la pulsación larga ha sido llamada
@@ -226,6 +233,7 @@ int Init_timerJoyPulsacionLarga (void){
   return NULL;
 
 }
+
 
 //Si vence el timer de 1s = pulsación larga entra a la callback y manda el mensaje:
 void TimerJoyPulsacionLarga_Callback(void *arg){
@@ -253,11 +261,13 @@ void TimerJoyPulsacionLarga_Callback(void *arg){
       break;
     default: break;
   }
+
 }
+
 
 int Init_MsgQueue_Joy(void){
 
-  mid_MsgQueue_Joy = osMessageQueueNew(16, sizeof(uint8_t), NULL);              //REVISARLO
+  mid_MsgQueue_Joy = osMessageQueueNew(16, sizeof(uint8_t), NULL);
   if (mid_MsgQueue_Joy == NULL) {
     return (-1);
   }

@@ -4,8 +4,8 @@
 #include "cmsis_os2.h"
 #include "stm32f4xx_hal.h"
 
-//static GPIO_InitTypeDef GPIO_InitStruct;                            //hay que borrarlo del .c
-void initModJoy (void);                                                  //este también
+//static GPIO_InitTypeDef GPIO_InitStruct;                                      //
+void initModJoy (void);                                                         //hay que borrarlo del .c
 
 //extern osThreadId_t tid_joy;                                       //este no lo sé ahora mismo jajaj
 

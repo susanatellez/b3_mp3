@@ -1,21 +1,22 @@
-
-/*******************************************************************************
-Código para testear el módulo
-********************************************************************************/
 #include "cmsis_os2.h"        // CMSIS RTOS header file
 #include "stm32f4xx_hal.h"
 #include <stdlib.h>
 
-#include "joystick.h"    
+#include "joystick.h"                                                           //
+
+/*******************************************************************************
+Código para testear el módulo
+********************************************************************************/
+
 osThreadId_t tid_Th_Joy_Test;
-//int Init_Th_Joy_Test(void);                                            //lo muevo al .H
+//int Init_Th_Joy_Test(void);                                                   //lo muevo al .H
 void Th_Joy_Test(void *argument);
 extern osMessageQueueId_t mid_MsgQueue_Joy;
 
 uint32_t sizeQueueJoy = 0;
 osStatus_t statusQueueJoy;
 
-uint8_t MsgQueue_JoyExtr = 0x00; 
+uint8_t MsgQueue_JoyExtr = 0x00;                                                //mensaje que sacas de la cola
 
 //Creación del hilo que testea el funcionamiento de las pulsaciones del joystick
 int Init_Th_Joy_Test(void) {
@@ -38,4 +39,3 @@ void Th_Joy_Test (void *argument) {
     statusQueueJoy = osMessageQueueGet(mid_MsgQueue_Joy, &MsgQueue_JoyExtr, NULL, 10U);
   }
 }
-

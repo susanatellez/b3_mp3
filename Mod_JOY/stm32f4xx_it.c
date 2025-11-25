@@ -80,14 +80,15 @@ void EXTI15_10_IRQHandler(void){                                                
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 
+  //Guardamos pin presionado
   pin_presionado.pin = GPIO_Pin;
-  
   if (GPIO_Pin == GPIO_PIN_10 || GPIO_Pin == GPIO_PIN_11){
     pin_presionado.port = GPIOB;
   } else {
     pin_presionado.port = GPIOE;
   }
-  //LEER SI ES UN FLANCO DE SUBIDA O BAJADA
+
+  //VEMOS SI ES UN FLANCO DE SUBIDA O BAJADA
    GPIO_PinState state = HAL_GPIO_ReadPin(pin_presionado.port, pin_presionado.pin);
   if (state == GPIO_PIN_SET) {
     // Flanco de subida
@@ -96,7 +97,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
     // Flanco de bajada
     osThreadFlagsSet(tid_joy, 0x0001);
   }
-  
 
 }
 
