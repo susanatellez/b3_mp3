@@ -58,9 +58,7 @@ void LCD (void *argument){
   MsgLCD_t mensaje;
   while(1){
       osMessageQueueGet(mid_MsgQueueLCD,&mensaje,NULL,osWaitForever);
-      LCD_limpiarBuffer();
-      LCD_writeLine(mensaje.linea1, mensaje.texto1);
-      LCD_writeLine(mensaje.linea2, mensaje.texto2);
+      LCD_writeLine(mensaje.linea, mensaje.texto);
       LCD_update();
     } 
 }
@@ -68,7 +66,7 @@ void LCD (void *argument){
 
 int Init_MsgQueue_LCD(void) {
  
-  mid_MsgQueueLCD = osMessageQueueNew(16,sizeof(MsgLCD_t) , NULL);//MIRAR  BIEN TAMAÑOS
+  mid_MsgQueueLCD = osMessageQueueNew(4,sizeof(MsgLCD_t) , NULL);//MIRAR  BIEN TAMAÑOS
   if (mid_MsgQueueLCD == NULL) {
     return (-1);
   }
