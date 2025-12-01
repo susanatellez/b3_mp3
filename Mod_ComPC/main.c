@@ -40,6 +40,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#include "com.h"
+
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
 #endif
@@ -119,7 +121,8 @@ int main(void)
 
   /* Create thread functions that start executing, 
   Example: osThreadNew(app_main, NULL, NULL); */
-
+  Init_ModCom();
+  InitTestCom();
   /* Start thread execution */
   osKernelStart();
 #endif

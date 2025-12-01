@@ -1,4 +1,4 @@
 #ifndef __COM_H
 #define __COM_H
-int Init_ThCom (void);
+void Init_ModCom (void);
 #endif

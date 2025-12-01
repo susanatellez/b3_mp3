@@ -8,10 +8,26 @@
  *---------------------------------------------------------------------------*/
  
 osThreadId_t tid_ThCom;                        // thread id
+osMessageQueueId_t  mid_MsgQueueCom;
+
+//DRIVER UART
 extern ARM_DRIVER_USART Driver_USART3;
 ARM_DRIVER_USART *USARTdrv = &Driver_USART3;
 void ComPC (void *argument);                   // thread function
+int Init_MsgQueue_Com(void);
+
+int Init_ThCom(void);
 void USART_Callback(uint32_t event);
+
+//Mensaje a enviar
+char msg[32];
+
+void Init_ModCom(void){
+  Init_ThCom();
+  Init_MsgQueue_Com();
+}
+
+//Inicialización del hilo 
 int Init_ThCom (void) {
  
   tid_ThCom = osThreadNew(ComPC, NULL, NULL);
@@ -22,6 +38,7 @@ int Init_ThCom (void) {
   return(0);
 }
  
+//Hilo de comunicación con el PC
 void ComPC (void *argument) {
   USARTdrv->Initialize(USART_Callback);
   USARTdrv->PowerControl(ARM_POWER_FULL);
@@ -31,7 +48,8 @@ void ComPC (void *argument) {
   USARTdrv->Control(ARM_USART_CONTROL_TX,1);
   
   while (1) {
-  USARTdrv->Send("\nHOLA",5);
+  osMessageQueueGet(mid_MsgQueueCom,&msg,NULL,osWaitForever);
+  USARTdrv->Send(msg,sizeof(msg));
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
     osThreadYield();                            // suspend thread
   }
@@ -45,6 +63,16 @@ void USART_Callback(uint32_t event){
     osThreadFlagsSet(tid_ThCom,0x01);
   }
   if (event & (ARM_USART_EVENT_RX_OVERFLOW | ARM_USART_EVENT_TX_UNDERFLOW)){
-    __breakpoint(0);
+   
   }
 }
+int Init_MsgQueue_Com(void) {
+ 
+  mid_MsgQueueCom= osMessageQueueNew(4,sizeof(msg), NULL);                              
+  if (mid_MsgQueueCom == NULL) {
+    return (-1);
+  }
+  return(0);
+}
+
+
