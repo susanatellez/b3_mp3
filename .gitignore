@@ -19,4 +19,7 @@ Mod_JOY/moduloJoystick.uvguix.susan
 Mod_JOY/moduloJoystick.uvguix.susana.tellez
 Mod_JOY/moduloJoystick.uvoptx
 
-
+# para Mod_temp
+Mod_temp/EventRecorderStub.scvd
+Mod_temp/modTemp.uvguix.susan
+Mod_temp/modTemp.uvoptx
