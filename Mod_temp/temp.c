@@ -14,6 +14,7 @@ void I2C_Callback(uint32_t eventId);
 void initI2C(void);
 static volatile uint32_t I2C_Event;
 int medirTemp(float *temp_c);
+uint8_t buf[2];
 
 //Cabeceras y variables del hilo 
 int Init_ThTemp(void);
@@ -22,6 +23,7 @@ int Init_MsgQueue_Temp(void);
 
 osThreadId_t tid_Temp;
 osMessageQueueId_t mid_MsgQueueTemp;
+float t;
 
 
 
@@ -67,7 +69,7 @@ int Init_ThTemp (void){
     return(0);
 }
 void Temp (void *argument){
-  float t;
+//  float t;
   while(1){
     if(medirTemp(&t) ==0){
       osMessageQueuePut(mid_MsgQueueTemp,&t,0,0);
@@ -78,7 +80,7 @@ void Temp (void *argument){
 int medirTemp (float *temp_c){
 
 //Buffer de lectura de temperatura
-uint8_t buf[2];
+//uint8_t buf[2];
   //Temperatura
 uint16_t temperatura;
   
