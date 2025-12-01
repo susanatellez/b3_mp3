@@ -23,7 +23,7 @@ int Init_MsgQueue_Temp(void);
 osThreadId_t tid_Temp;
 osMessageQueueId_t mid_MsgQueueTemp;
 
-
+float t;
 
 //Dirección del sensor en la linea I2C
 const uint8_t addr = 0x48;
@@ -71,7 +71,7 @@ int Init_ThTemp (void){
     return(0);
 }
 void Temp (void *argument){
-  float t;
+
   while(1){
     if(medirTemp(&t) ==0){
       osMessageQueuePut(mid_MsgQueueTemp,&t,0,0);
