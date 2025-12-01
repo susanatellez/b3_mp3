@@ -12,7 +12,7 @@ static ARM_DRIVER_I2C *I2Cdrv = &Driver_I2C1;
 
 void I2C_Callback(uint32_t eventId);
 void initI2C(void);
-static volatile uint32_t I2C_Event;
+
 int medirTemp(float *temp_c);
 
 //Cabeceras y variables del hilo 
@@ -55,7 +55,11 @@ void initI2C(void){
 
 //Función de callback del I2C
 void I2C_Callback(uint32_t eventId){
-  I2C_Event |= eventId;
+  
+
+  if(eventId & ARM_I2C_EVENT_TRANSFER_DONE){
+    osThreadFlagsSet(tid_Temp,0x01);
+  }
 }
 
 //---------------------------------HILO-----------------------------------------
@@ -78,24 +82,19 @@ void Temp (void *argument){
 int medirTemp (float *temp_c){
 
 //Buffer de lectura de temperatura
-uint8_t buf[2];
+  uint8_t buf[2];
   //Temperatura
-uint16_t temperatura;
-  
+  uint16_t temperatura;
+
+
   I2Cdrv->MasterTransmit(addr,&reg_temp,1,true);                                // Si no funciona poner MasterTransmit(addr << 1,&reg_temp,1,true);
-  while ((I2C_Event & ARM_I2C_EVENT_TRANSFER_DONE) == 0U);
-  if (I2Cdrv->GetDataCount() != 1) {
-  return -1;
-  }
+  osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
 
-  I2C_Event = 0U;
 
-  I2Cdrv->MasterReceive(addr,buf,2,false);                                      // Si no funciona poner I2Cdrv->MasterReceive(addr,buf,2,false);
+  I2Cdrv->MasterReceive(addr,buf,2,false);                                      // Si no funciona poner I2Cdrv->MasterReceive(addr << 1,buf,2,false);
+  osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   
-  while ((I2C_Event & ARM_I2C_EVENT_TRANSFER_DONE) == 0U);
-  if (I2Cdrv->GetDataCount() != 2){
-    return -1;
-  }
+
   // LM75B: 11 bits en complemento a 2, resolución 0.125 ºC
   temperatura = (int16_t)((buf[0] << 8) | buf[1]);
   temperatura >>= 5;                    // Dejar 11 bits significativos
