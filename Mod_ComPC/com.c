@@ -8,7 +8,8 @@
  *---------------------------------------------------------------------------*/
  
 osThreadId_t tid_ThCom;                        // thread id
- 
+extern ARM_DRIVER_USART Driver_USART3;
+ARM_DRIVER_USART *USARTdrv = &Driver_USART3;
 void ComPC (void *argument);                   // thread function
 void USART_Callback(uint32_t event);
 int Init_ThCom (void) {
@@ -22,9 +23,16 @@ int Init_ThCom (void) {
 }
  
 void ComPC (void *argument) {
- 
+  USARTdrv->Initialize(USART_Callback);
+  USARTdrv->PowerControl(ARM_POWER_FULL);
+  USARTdrv->Control(ARM_USART_MODE_ASYNCHRONOUS|ARM_USART_DATA_BITS_8|
+                    ARM_USART_PARITY_NONE|ARM_USART_STOP_BITS_1|ARM_USART_FLOW_CONTROL_NONE,9600);
+  USARTdrv->Control(ARM_USART_CONTROL_RX,1);
+  USARTdrv->Control(ARM_USART_CONTROL_TX,1);
+  
   while (1) {
-
+  USARTdrv->Send("\nHOLA",5);
+  osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
     osThreadYield();                            // suspend thread
   }
 }
@@ -36,5 +44,7 @@ void USART_Callback(uint32_t event){
   if (event & mask ){
     osThreadFlagsSet(tid_ThCom,0x01);
   }
-  
+  if (event & (ARM_USART_EVENT_RX_OVERFLOW | ARM_USART_EVENT_TX_UNDERFLOW)){
+    __breakpoint(0);
+  }
 }
