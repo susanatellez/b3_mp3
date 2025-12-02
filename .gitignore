@@ -11,6 +11,7 @@ Mod_clk/Proyecto_B3.uvguix.susan
 Mod_clk/Proyecto_B3.uvoptx
 
 # para Mod_LCD
+Mod_LCD/EventRecorderStub.scvd
 Mod_LCD/Proyecto_B3.uvguix.susan
 Mod_LCD/Proyecto_B3.uvoptx
 
@@ -28,3 +29,8 @@ Mod_temp/modTemp.uvoptx
 Mod_PWM/EventRecorderStub.scvd
 Mod_PWM/moduloPWM.uvguix.susan
 Mod_PWM/moduloPWM.uvoptx
+
+# para Mod_
+Mod_ComPC/EventRecorderStub.scvd
+Mod_ComPC/ModComPC.uvguix.susan
+Mod_ComPC/ModComPC.uvoptx
