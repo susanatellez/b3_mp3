@@ -5,7 +5,6 @@
 typedef struct {
     uint8_t linea;
     char texto[32];
-
 } MsgLCD_t;
 
 void initModLCD (void);

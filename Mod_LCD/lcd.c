@@ -26,6 +26,7 @@ void symbolToLocalBuffer(uint8_t line,uint8_t symbol);
 void LCD_writeLine(uint8_t line, const char* texto);
 void LCD_llenarBuffer(void) ;
 void LCD_limpiarBuffer(void) ;
+void LCD_Callback (uint32_t event);
 
 //Variables
 static unsigned char buffer[512];
@@ -46,8 +47,11 @@ void initModLCD (void){
 //FUNCIÓNES RELATIVAS A LOS HILOS
 
 int Init_ThLCD (void) {
- 
-  tid_LCD = osThreadNew(LCD, NULL, NULL);
+  const osThreadAttr_t ThLCD_attributes = {
+    .name = "ThLCD", //Poner este campo si no no funciona de manera correcta
+    .stack_size = 512U,
+  };
+  tid_LCD = osThreadNew(LCD, NULL, &ThLCD_attributes);
   if (tid_LCD == NULL) {
     return(-1);
   }
@@ -77,7 +81,7 @@ void LCD_reset(void){
 
   GPIO_InitTypeDef GPIO_InitStruct;
 
-  SPIdrv->Initialize(NULL);
+  SPIdrv->Initialize(LCD_Callback);
   SPIdrv->PowerControl(ARM_POWER_FULL);
 
   SPIdrv->Control(ARM_SPI_MODE_MASTER | ARM_SPI_CPOL1_CPHA1 | ARM_SPI_MSB_LSB | ARM_SPI_DATA_BITS(8), 20000000); //
@@ -118,7 +122,8 @@ void LCD_wr_data(unsigned char data) {
   // Escribir un dato (data) usando la función SPIDrv->Send(…); 
   SPIdrv->Send(&data,1);
   // Esperar a que se libere el bus SPI; 
-  while(SPIdrv->GetStatus().busy);
+  //while(SPIdrv->GetStatus().busy);  
+  osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);  
   // Seleccionar CS = 1;
   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14,GPIO_PIN_SET);
 }
@@ -131,7 +136,8 @@ void LCD_wr_cmd(unsigned char cmd) {
   // Escribir un comando (cmd) usando la función SPIDrv->Send(…); 
   SPIdrv->Send(&cmd,1);
   // Esperar a que se libere el bus SPI; 
-  while(SPIdrv->GetStatus().busy);
+  //while(SPIdrv->GetStatus().busy);
+  osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   // Seleccionar CS = 1; } 
   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14,GPIO_PIN_SET);
 }
@@ -225,7 +231,11 @@ void LCD_limpiarBuffer(void) {
     }
 }
 
-
+void LCD_Callback (uint32_t event){
+  if(event & ARM_SPI_EVENT_TRANSFER_COMPLETE){
+  osThreadFlagsSet(tid_LCD,0x01);
+  }
+}
 
 
 
