@@ -23,3 +23,8 @@ Mod_JOY/moduloJoystick.uvoptx
 Mod_temp/EventRecorderStub.scvd
 Mod_temp/modTemp.uvguix.susan
 Mod_temp/modTemp.uvoptx
+
+# para Mod_PWM
+Mod_PWM/EventRecorderStub.scvd
+Mod_PWM/moduloPWM.uvguix.susan
+Mod_PWM/moduloPWM.uvoptx
