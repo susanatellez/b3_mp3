@@ -1,8 +1,9 @@
-#include "cmsis_os2.h"                          // CMSIS RTOS header file
+#include "cmsis_os2.h" // CMSIS RTOS header file
 #include "com.h"
 #include "Driver_USART.h"
 #include <stdio.h>
 #include <string.h>
+#include "stm32f4xx.h"
 /*----------------------------------------------------------------------------
  *      Thread 1 'Thread_Name': Sample thread
  *---------------------------------------------------------------------------*/
@@ -68,9 +69,7 @@ void USART_Callback(uint32_t event){
   if (event & mask ){
     osThreadFlagsSet(tid_ThCom,0x01);
   }
-  if (event & (ARM_USART_EVENT_RX_OVERFLOW | ARM_USART_EVENT_TX_UNDERFLOW)){
-   
-  }
+
 }
 int Init_MsgQueue_Com(void) {
  

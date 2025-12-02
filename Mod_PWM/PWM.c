@@ -78,27 +78,31 @@ void ThPWM (void *argument){
     statusQueuePWM = osMessageQueueGet(mid_MsgQueue_PWM, &MsgQueue_PWM, NULL, 10U);
 
     if(statusQueuePWM == osOK){
-      switch(MsgQueue_PWM){       //20 000 /  = kHz (arriba y abajo)
+      switch(MsgQueue_PWM){       //20 000 / period = kHz (arriba y abajo)
         case 0x00:
-          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);                                //Para cambiar parámetros de timers, debemos pararlo, cambiar y runear
-          break;
+//          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);                                //Para cambiar parámetros de timers, debemos pararlo, cambiar y runear
+          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
+        break;
         case 0x01:
-          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);                                //Para cambiar parámetros de timers, debemos pararlo, cambiar y runear
-          tim1.Init.Period = 4;
-          HAL_TIM_OC_Init(&tim1);                                               //
-          HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1); 
+//          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);                                //Para cambiar parámetros de timers, debemos pararlo, cambiar y runear
+          //tim1.Init.Period = 4;
+          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,20);
+//          HAL_TIM_OC_Init(&tim1);                                               //
+//          HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1); 
           break;
         case 0x10:
-          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);                                //Para cambiar parámetros de timers, debemos pararlo, cambiar y runear
-          tim1.Init.Period = 9;
-          HAL_TIM_OC_Init(&tim1);                                               //
-          HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1); 
+//          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);                                //Para cambiar parámetros de timers, debemos pararlo, cambiar y runear
+          //tim1.Init.Period = 9;
+          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,100);
+//          HAL_TIM_OC_Init(&tim1);                                               //
+//          HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1); 
           break;
         case 0x11:
-          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);                                //Para cambiar parámetros de timers, debemos pararlo, cambiar y runear
-          tim1.Init.Period = 19;
-          HAL_TIM_OC_Init(&tim1);                                               //
-          HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1); 
+//          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);                                //Para cambiar parámetros de timers, debemos pararlo, cambiar y runear
+          //tim1.Init.Period = 19;
+          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,198);
+//          HAL_TIM_OC_Init(&tim1);                                               //
+//          HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1); 
           break;
         default: break;
       }
@@ -115,21 +119,34 @@ static void InitTimer1(void){
   __HAL_RCC_TIM1_CLK_ENABLE();                                                  //Habilitamos reloj del periférico del tIM2
   
   tim1.Instance = TIM1;                                                         //=¿con qué timer trabajaremos?
-  tim1.Init.Prescaler = 8399;                                                   //(TIM1 clk = ) 168 MHz/ 8400 =  Hz
-  tim1.Init.Period = 75;                                                         // 20 000 /  = kHz (arriba y abajo)
-  HAL_TIM_OC_Init(&tim1);                                                       //para mayor resolución te renta preescaler de 0 = 1 (pwm, input..)
+  tim1.Init.Prescaler = 839;                                                   //(TIM1 clk = ) 168 MHz/ 840 =  Hz
+  tim1.Init.Period = 199;                                                        // 200 000 / 200 = 1kHz (arriba y abajo)
+  tim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  tim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  tim1.Init.RepetitionCounter = 0;
+  HAL_TIM_PWM_Init(&tim1);                                                       //para mayor resolución te renta preescaler de 0 = 1 (pwm, input..)
   
-  TIM_Channel_InitStruct.OCMode = TIM_OCMODE_TOGGLE;                            //cada vez que el timer alcanza el valor de comparación, la salida del pin cambia de estado
+//  TIM_Channel_InitStruct.OCMode = TIM_OCMODE_TOGGLE;                            //cada vez que el timer alcanza el valor de comparación, la salida del pin cambia de estado
+//  TIM_Channel_InitStruct.OCPolarity = TIM_OCPOLARITY_HIGH;                      //
+//  TIM_Channel_InitStruct.OCFastMode = TIM_OCFAST_DISABLE;                       //el modo rapido no es necesario para el toggle
+//  HAL_TIM_OC_ConfigChannel(&tim1, &TIM_Channel_InitStruct, TIM_CHANNEL_1);      //aplicamos configuracion al canal 1 del TIM1
+//  
+//  //HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1);                                       //comienza a generar la señal
+  
+  TIM_Channel_InitStruct.OCMode = TIM_OCMODE_PWM1;                            //cada vez que el timer alcanza el valor de comparación, la salida del pin cambia de estado
   TIM_Channel_InitStruct.OCPolarity = TIM_OCPOLARITY_HIGH;                      //
   TIM_Channel_InitStruct.OCFastMode = TIM_OCFAST_DISABLE;                       //el modo rapido no es necesario para el toggle
-  HAL_TIM_OC_ConfigChannel(&tim1, &TIM_Channel_InitStruct, TIM_CHANNEL_1);      //aplicamos configuracion al canal 1 del TIM1
+  TIM_Channel_InitStruct.Pulse = 0; 
+  HAL_TIM_PWM_ConfigChannel(&tim1, &TIM_Channel_InitStruct, TIM_CHANNEL_1);      //aplicamos configuracion al canal 1 del TIM1
   
-  //HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1);                                       //comienza a generar la señal
+  HAL_TIM_PWM_Start(&tim1, TIM_CHANNEL_1);
+  
+  
   
 }
 
 int Init_MsgQueue_PWM(void){
-  mid_MsgQueue_PWM = osMessageQueueNew(4, sizeof(uint8_t), NULL);              //pongo cola de 4??
+  mid_MsgQueue_PWM = osMessageQueueNew(4, sizeof(uint8_t), NULL);              
   if (mid_MsgQueue_PWM == NULL) {
     return (-1);
   }

@@ -25,7 +25,7 @@ osMessageQueueId_t mid_MsgQueueTemp;
 
 float t;
 
-//Dirección del sensor en la linea I2C
+//Dirección del sensor en la linea I2C A2,A1 y A0 = GND = 0 
 const uint8_t addr = 0x48;
 
 //Dirección de los registros internos (por si hiciera falta)
@@ -95,9 +95,9 @@ int medirTemp (float *temp_c){
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   
 
-  // 11 bits en complemento a 2, resolución 0.125 ºC
-  temperatura = (int16_t)((buf[0] << 8) | buf[1]);
-  temperatura >>= 5;                    // Dejar 11 bits significativos 
+  // Medida que entrega: 11 bits en complemento a 2, resolución 0.125 ºC
+  temperatura = (int16_t)((buf[0] << 8) | buf[1]); //Invierte los bytes recibidos, buf[0] mas significativos, buf[1] menos, los junta en 16 bits
+  temperatura >>= 5;                    // Dejar 11 bits significativos (visto en el datasheet)
   *temp_c = (float)temperatura * 0.125f;                                        //Para redondear en sprintf a 1 decimal ("Temp = %.1f ºC\n", *temp_c);
 
   return 0;
