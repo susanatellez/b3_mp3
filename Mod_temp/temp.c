@@ -97,8 +97,8 @@ int medirTemp (float *temp_c){
 
   // LM75B: 11 bits en complemento a 2, resolución 0.125 ºC
   temperatura = (int16_t)((buf[0] << 8) | buf[1]);
-  temperatura >>= 5;                    // Dejar 11 bits significativos
-  *temp_c = (float)temperatura * 0.125f;
+  temperatura >>= 5;                    // Dejar 11 bits significativos 
+  *temp_c = (float)temperatura * 0.125f;                                        //Para redondear en sprintf a 1 decimal ("Temp = %.1f ºC\n", *temp_c);
 
   return 0;
 }

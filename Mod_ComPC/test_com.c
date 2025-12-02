@@ -19,11 +19,14 @@ int InitTestCom (void){
 
 
 void thTestCom (void *argument){
-  char mensaje[32];
+  
   uint8_t cont = 0;
+  uint16_t len;
+  t_msgcom msg;
   while(1){
-    sprintf(mensaje,"/n Mensaje numero:%d",cont);
-    osMessageQueuePut(mid_MsgQueueCom, &mensaje, 0, 0);
+    len = sprintf(msg.mensaje," Mensaje numero:%d\n",cont);
+    msg.longitud = len;
+    osMessageQueuePut(mid_MsgQueueCom, &msg, 0, 0);
     cont = (cont<10) ? cont + 1 : 0;
      osDelay(1000);
   }

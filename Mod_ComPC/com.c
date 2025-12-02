@@ -20,7 +20,7 @@ int Init_ThCom(void);
 void USART_Callback(uint32_t event);
 
 //Mensaje a enviar
-char msg[32];
+//char msg[32];
 
 void Init_ModCom(void){
   Init_ThCom();
@@ -40,6 +40,7 @@ int Init_ThCom (void) {
  
 //Hilo de comunicación con el PC
 void ComPC (void *argument) {
+  t_msgcom msg;
   USARTdrv->Initialize(USART_Callback);
   USARTdrv->PowerControl(ARM_POWER_FULL);
   USARTdrv->Control(ARM_USART_MODE_ASYNCHRONOUS|ARM_USART_DATA_BITS_8|
@@ -49,7 +50,7 @@ void ComPC (void *argument) {
   
   while (1) {
   osMessageQueueGet(mid_MsgQueueCom,&msg,NULL,osWaitForever);
-  USARTdrv->Send(msg,sizeof(msg));
+  USARTdrv->Send(msg.mensaje,msg.longitud);
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
     osThreadYield();                            // suspend thread
   }
@@ -68,7 +69,7 @@ void USART_Callback(uint32_t event){
 }
 int Init_MsgQueue_Com(void) {
  
-  mid_MsgQueueCom= osMessageQueueNew(4,sizeof(msg), NULL);                              
+  mid_MsgQueueCom= osMessageQueueNew(4,sizeof(t_msgcom), NULL);                              
   if (mid_MsgQueueCom == NULL) {
     return (-1);
   }
