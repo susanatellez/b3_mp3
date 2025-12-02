@@ -32,4 +32,5 @@ EN GENERAL, INTENTAR CONSUMIR EL MENOR NÚMERO DE RECURSOS POSIBLES
 CADA VEZ QUE CARGUES UN PROYECTO ACTUALIZADO ACUÉRDATE DE . . .
 -----------------------------------------------------------------------------------------
 En options to target, debbuger, añadir el ST-LINK
-y en view activar que se vea al momento los cambios
+En view activar que se vea al momento los cambios
+Y los rchivos RTX_Config.h y RTX_Device.h
