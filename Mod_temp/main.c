@@ -40,6 +40,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "temp.h"
+#include "test_temp.h"
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
 #endif
@@ -121,7 +122,7 @@ int main(void)
   Example: osThreadNew(app_main, NULL, NULL); */
   
   initModTemp();
-
+  Init_Th_Temp_Test();
   /* Start thread execution */
   osKernelStart();
 #endif

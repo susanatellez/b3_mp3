@@ -87,15 +87,15 @@ int medirTemp (float *temp_c){
   uint16_t temperatura;
 
 
-  I2Cdrv->MasterTransmit(addr,&reg_temp,1,true);                                // Si no funciona poner MasterTransmit(addr << 1,&reg_temp,1,true);
+  I2Cdrv->MasterTransmit(addr,&reg_temp,1,true);                                
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
 
 
-  I2Cdrv->MasterReceive(addr,buf,2,false);                                      // Si no funciona poner I2Cdrv->MasterReceive(addr << 1,buf,2,false);
+  I2Cdrv->MasterReceive(addr,buf,2,false);                                      
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   
 
-  // LM75B: 11 bits en complemento a 2, resolución 0.125 ºC
+  // 11 bits en complemento a 2, resolución 0.125 ºC
   temperatura = (int16_t)((buf[0] << 8) | buf[1]);
   temperatura >>= 5;                    // Dejar 11 bits significativos 
   *temp_c = (float)temperatura * 0.125f;                                        //Para redondear en sprintf a 1 decimal ("Temp = %.1f ºC\n", *temp_c);
