@@ -1,10 +1,9 @@
 USART1 sin nada <- FALTA
   USART3 con los 2 primeros como en las diapositivas, y los ultimos 3 sin nada <= BUSCARLO
 
-I2C1 como en el documento Pb8 PB9 BIEN
+I2C1 como en el documento PB8 PB9 BIEN
 
 SPI1 como en las anteriores prácticas BIEN
-
 
 LOS HILOS DE TEST ES MEJOR DEJARLOS COMENTADOS LUEGO SE HAYA COMPROBADO
 EL CORRECTO FUNCIONAMIENTO DE CADA MÓDULO
@@ -28,4 +27,9 @@ A TENER EN CUENTA SIEMPRE
 -----------------------------------------------------------------------------------------
 EN GENERAL, INTENTAR CONSUMIR EL MENOR NÚMERO DE RECURSOS POSIBLES
 - Agrupar funcionalidades en hilos
-- Decrementar tamaño de colas, timers e hilos
+- Decrementar tamaño de colas, timers (virtuales) e hilos
+
+CADA VEZ QUE CARGUES UN PROYECTO ACTUALIZADO ACUÉRDATE DE . . .
+-----------------------------------------------------------------------------------------
+En options to target, debbuger, añadir el ST-LINK
+y en view activar que se vea al momento los cambios
