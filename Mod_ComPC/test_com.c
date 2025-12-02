@@ -10,6 +10,7 @@ extern osMessageQueueId_t mid_MsgQueueCom;
 void thTestCom (void *argument);
 
 int InitTestCom (void){
+  
     tid_Th_Test_Com = osThreadNew(thTestCom, NULL, NULL);
   if (tid_Th_Test_Com == NULL) {
     return(-1);

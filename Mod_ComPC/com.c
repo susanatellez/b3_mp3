@@ -29,8 +29,13 @@ void Init_ModCom(void){
 
 //Inicialización del hilo 
 int Init_ThCom (void) {
- 
-  tid_ThCom = osThreadNew(ComPC, NULL, NULL);
+
+  const osThreadAttr_t ThCom_attributes = {
+    .name = "ThCom",
+    .stack_size = 256U, // <- Nuevo tamaño
+  };
+
+  tid_ThCom = osThreadNew(ComPC, NULL, &ThCom_attributes);
   if (tid_ThCom == NULL) {
     return(-1);
   }
