@@ -100,7 +100,13 @@ void initModJoy (void) {
 
 // INICIALIZACIÓN DEL HILO DEL JOYSTICK
 int Init_ThJoy (void) {
-  tid_joy = osThreadNew(ThJoy, NULL, NULL);
+
+  const osThreadAttr_t ThJoy_attributes = {
+    .name = "ThJoy",
+    .stack_size = 128U, // <- Nuevo tamaño
+  };
+
+  tid_joy = osThreadNew(ThJoy, NULL, &ThJoy_attributes);
   if (tid_joy == NULL) {
     return(-1);
   }

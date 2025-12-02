@@ -21,7 +21,12 @@ uint8_t MsgQueue_JoyExtr = 0x00;                                                
 //Creación del hilo que testea el funcionamiento de las pulsaciones del joystick
 int Init_Th_Joy_Test(void) {
 
-  tid_Th_Joy_Test = osThreadNew(Th_Joy_Test, NULL, NULL);
+  const osThreadAttr_t ThTest_attributes = {
+    .name = "ThTest",
+    .stack_size = 128U, // <- Nuevo tamaño
+  };
+
+  tid_Th_Joy_Test = osThreadNew(Th_Joy_Test, NULL, &ThTest_attributes);
   if (tid_Th_Joy_Test == NULL) {
     return(-1);
   }
