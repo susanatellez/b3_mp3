@@ -84,7 +84,7 @@ int medirTemp (float *temp_c){
 //Buffer de lectura de temperatura
   uint8_t buf[2];
   //Temperatura
-  uint16_t temperatura;
+  int16_t temperatura;
 
 
   I2Cdrv->MasterTransmit(addr,&reg_temp,1,true);                                
@@ -96,9 +96,9 @@ int medirTemp (float *temp_c){
   
 
   // Medida que entrega: 11 bits en complemento a 2, resolución 0.125 ºC
-  temperatura = (int16_t)((buf[0] << 8) | buf[1]); //Invierte los bytes recibidos, buf[0] mas significativos, buf[1] menos, los junta en 16 bits
+  temperatura = ((buf[0] << 8) | buf[1]); //Invierte los bytes recibidos, buf[0] mas significativos, buf[1] menos, los junta en 16 bits
   temperatura >>= 5;                    // Dejar 11 bits significativos (visto en el datasheet)
-  *temp_c = (float)temperatura * 0.125f;                                        //Para redondear en sprintf a 1 decimal ("Temp = %.1f ºC\n", *temp_c);
+  *temp_c = temperatura * 0.125f;                                        //Para redondear en sprintf a 1 decimal ("Temp = %.1f ºC\n", *temp_c);
 
   return 0;
 }

@@ -84,21 +84,21 @@ void ThPWM (void *argument){
 //          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
         break;
         case 0x01:
-          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,20);
+          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,400);
 //          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
 //          tim1.Init.Period = 4;
 //          HAL_TIM_OC_Init(&tim1);
 //          HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1); 
           break;
         case 0x10:
-          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,100);
+          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,600);
 //          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
 //          tim1.Init.Period = 9;
 //          HAL_TIM_OC_Init(&tim1);
 //          HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1); 
           break;
         case 0x11:
-          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,198);
+          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,800);
 //          HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
 //          tim1.Init.Period = 19;
 //          HAL_TIM_OC_Init(&tim1);
@@ -119,8 +119,8 @@ static void InitTimer1(void){
   __HAL_RCC_TIM1_CLK_ENABLE();                                                  //Habilitamos reloj del periférico del tIM2
   
   tim1.Instance = TIM1;                                                         //=¿con qué timer trabajaremos?
-  tim1.Init.Prescaler = 839;                                                    //(TIM1 clk = ) 168 MHz/ 840 =  Hz
-  tim1.Init.Period = 199;                                                        // 200 000 / 200 = 1kHz (arriba y abajo)
+  tim1.Init.Prescaler = 83;                                                    //(TIM1 clk = ) 168 MHz/ 840 =  Hz
+  tim1.Init.Period = 999;                                                        // 200 000 / 100 = 1kHz (arriba y abajo)
   tim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   tim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   tim1.Init.RepetitionCounter = 0;
