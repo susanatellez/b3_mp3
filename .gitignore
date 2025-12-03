@@ -30,7 +30,20 @@ Mod_PWM/EventRecorderStub.scvd
 Mod_PWM/moduloPWM.uvguix.susan
 Mod_PWM/moduloPWM.uvoptx
 
-# para Mod_
+# para Mod_ComPC
 Mod_ComPC/EventRecorderStub.scvd
 Mod_ComPC/ModComPC.uvguix.susan
 Mod_ComPC/ModComPC.uvoptx
+
+# para Mod_POT_2
+
+
+# para Mod_LED_RGB
+Mod_RGB/EventRecorderStub.scvd
+Mod_RGB/moduloRGB.uvguix.susan
+Mod_RGB/moduloRGB.uvoptx
+
+# para Mod_MP3
+Mod_MP3/EventRecorderStub.scvd
+Mod_MP3/ModMp3.uvguix.susan
+Mod_MP3/ModMp3.uvoptx
