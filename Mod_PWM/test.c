@@ -36,31 +36,31 @@ int Init_ThTest (void) {
 void ThTest (void *argument) {
   while (1) {
 
-//    MsgQueue_Test = 0x01;                                                       //DO
+//    MsgQueue_Test = 0x01;                                                       //
 //    osMessageQueuePut(mid_MsgQueue_PWM, &MsgQueue_Test, 0U, 0U);
 //    osDelay(200);
 
-//    MsgQueue_Test = 0x10;                                                       //MI
+//    MsgQueue_Test = 0x10;                                                       //
 //    osMessageQueuePut(mid_MsgQueue_PWM, &MsgQueue_Test, 0U, 0U);
 //    osDelay(200);
 
-//    MsgQueue_Test = 0x11;                                                       //SOL
+//    MsgQueue_Test = 0x11;                                                       //
 //    osMessageQueuePut(mid_MsgQueue_PWM, &MsgQueue_Test, 0U, 0U);
 //    osDelay(200);
 
-//    MsgQueue_Test = 0x10;                                                       //MI
+//    MsgQueue_Test = 0x10;                                                       //
 //    osMessageQueuePut(mid_MsgQueue_PWM, &MsgQueue_Test, 0U, 0U);
 //    osDelay(200);
 
-//    MsgQueue_Test = 0x01;                                                       //DO
+//    MsgQueue_Test = 0x01;                                                       //
 //    osMessageQueuePut(mid_MsgQueue_PWM, &MsgQueue_Test, 0U, 0U);
 //    osDelay(200);
 
-//    MsgQueue_Test = 0x00;                                                       //SILENCIO
+//    MsgQueue_Test = 0x00;                                                       //
 //    osMessageQueuePut(mid_MsgQueue_PWM, &MsgQueue_Test, 0U, 0U);
 //    osDelay(1000);
 
-    MsgQueue_Test = 0x01;                                                       //DO
+    MsgQueue_Test = 0x01;                                                       //
     osMessageQueuePut(mid_MsgQueue_PWM, &MsgQueue_Test, 0U, 0U);
     osDelay(200);
 
@@ -68,7 +68,7 @@ void ThTest (void *argument) {
     osMessageQueuePut(mid_MsgQueue_PWM, &MsgQueue_Test, 0U, 0U);
     osDelay(1000);
 
-    MsgQueue_Test = 0x11;                                                       //SOL
+    MsgQueue_Test = 0x11;                                                       //
     osMessageQueuePut(mid_MsgQueue_PWM, &MsgQueue_Test, 0U, 0U);
     osDelay(200);
 

@@ -41,17 +41,20 @@ void initModPWM (void){
   GPIO_InitStruct.Pin = GPIO_PIN_9;                                             //Configuramos el pin PE9
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;                                       //como salida digital de tipo push.pull
   GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;                                    //en modo función alternativa
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;//
   
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);                                       //inicializamos el pin pb11 con la configuracion descrita
-  
-  //Inicializo el hilo del PWM
-  Init_ThPWM ();
-  
-  //Inicializo el timer
-  InitTimer1();
-  
+
   //Inicializo la cola
   Init_MsgQueue_PWM();
+
+  //Inicializo el timer
+  InitTimer1();
+
+  //Inicializo el hilo del PWM
+  Init_ThPWM();
+  
+
 
 }
 
@@ -60,7 +63,7 @@ int Init_ThPWM (void){
 
   const osThreadAttr_t ThPWM_attributes = {
     .name = "ThPWM",
-    .stack_size = 256U, // <- Nuevo tamaño
+    .stack_size = 512U, // <- Nuevo tamaño
   };
 
   tid_PWM = osThreadNew(ThPWM, NULL, &ThPWM_attributes);
@@ -122,8 +125,6 @@ static void InitTimer1(void){
   tim1.Init.Prescaler = 83;                                                    //(TIM1 clk = ) 168 MHz/ 840 =  Hz
   tim1.Init.Period = 999;                                                        // 200 000 / 100 = 1kHz (arriba y abajo)
   tim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  tim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  tim1.Init.RepetitionCounter = 0;
   HAL_TIM_PWM_Init(&tim1);                                                      //para mayor resolución te renta preescaler de 0 = 1 (pwm, input..)
   
   TIM_Channel_InitStruct.OCMode = TIM_OCMODE_PWM1;                              //cada vez que el timer alcanza el valor de comparación, la salida del pin cambia de estado
