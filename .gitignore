@@ -36,7 +36,9 @@ Mod_ComPC/ModComPC.uvguix.susan
 Mod_ComPC/ModComPC.uvoptx
 
 # para Mod_POT_2
-
+Mod_Pot2/EventRecorderStub.scvd
+Mod_Pot2/moduloPOT.uvguix.susan
+Mod_Pot2/moduloPOT.uvoptx
 
 # para Mod_LED_RGB
 Mod_RGB/EventRecorderStub.scvd
@@ -47,3 +49,4 @@ Mod_RGB/moduloRGB.uvoptx
 Mod_MP3/EventRecorderStub.scvd
 Mod_MP3/ModMp3.uvguix.susan
 Mod_MP3/ModMp3.uvoptx
+
