@@ -28,6 +28,7 @@ A TENER EN CUENTA SIEMPRE
 EN GENERAL, INTENTAR CONSUMIR EL MENOR NÚMERO DE RECURSOS POSIBLES
 - Agrupar funcionalidades en hilos
 - Decrementar tamaño de colas, timers (virtuales) e hilos
+- Y MUCHO CUIDADO CON EL TAMAÑO DE LOS HILOS !!
 
 CADA VEZ QUE CARGUES UN PROYECTO ACTUALIZADO ACUÉRDATE DE . . .
 -----------------------------------------------------------------------------------------
