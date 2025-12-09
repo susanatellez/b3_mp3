@@ -61,12 +61,12 @@ void initModPWM (void){
 
 int Init_ThPWM (void){
 
-  const osThreadAttr_t ThPWM_attributes = {
-    .name = "ThPWM",
-    .stack_size = 512U, // <- Nuevo tamaño
-  };
+//  const osThreadAttr_t ThPWM_attributes = {
+//    .name = "ThPWM",
+//    .stack_size = 512U, // <- Nuevo tamaño
+//  };
 
-  tid_PWM = osThreadNew(ThPWM, NULL, &ThPWM_attributes);
+  tid_PWM = osThreadNew(ThPWM, NULL, NULL);
   if (tid_PWM == NULL) {
     return(-1);
   }
