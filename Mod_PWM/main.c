@@ -113,7 +113,6 @@ int main(void)
   SystemCoreClockUpdate();
 
   /* Add your application code here */
-  //Inicializo el timer
 
 
 #ifdef RTE_CMSIS_RTOS2

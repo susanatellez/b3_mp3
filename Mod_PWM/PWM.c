@@ -20,7 +20,7 @@ void ThPWM (void *argument);
 
 // TIMER
 TIM_HandleTypeDef tim1;                                                         //
- void InitTimer1(void);                                                   //CONFIGURACIO E INICIALIZACION TIMER
+void InitTimer1(void);                                                   //CONFIGURACIO E INICIALIZACION TIMER
 
 // COLA DE MENSAJES
 /* Thread a la espera de cola de mensajes que indique que hay que 
