@@ -84,7 +84,7 @@ void ThPOT (void *argument){
 
   while (1) {
     value = ADC_getVoltage(&adchandle, 10); // El ADC solo conoce canales por eso le pasamos el CN10
-    MsgQueue_POT = (uint8_t)(value / (VREF-0.12) * 30.0f);
+    MsgQueue_POT = (uint8_t)((value-0.15) / (3.26-0.15) * 30.0f);
     //En nuestra placa va del 0.14 al 3.29   de manera que se ve 3-99 por eso las cuentas se ven RARUNAS
     statusQueuePOT = osMessageQueuePut(mid_MsgQueue_POT, &MsgQueue_POT, NULL, 10U);
     osDelay(1000);
