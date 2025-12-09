@@ -8,6 +8,7 @@ osThreadId_t tid_Th_Test_Mp3;
 extern osMessageQueueId_t mid_MsgQueueMp3;
 
 void thTestMp3 (void *argument);
+t_comando msg;
 
 int InitTestMp3 (void){
   
@@ -22,15 +23,21 @@ int InitTestMp3 (void){
 void thTestMp3 (void *argument){
   
 
-  t_comando msg;
+
   while(1){
+    //Volumen al maximo
+    msg.com = 0x06;
+    msg.dat1= 0x00;
+    msg.dat2= 0x1E;
+    osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
+    osDelay(100);
     //Manda la primera cancion
     msg.com = 0x03;
     msg.dat1= 0x00;
-    msg.dat2= 0x01;
+    msg.dat2= 0x02;
     osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
    
-    osDelay(10000);
+    osDelay(1000);
     //Pone pausa
     msg.com = 0x0E;
     msg.dat1= 0x00;

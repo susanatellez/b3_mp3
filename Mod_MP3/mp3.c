@@ -49,7 +49,7 @@ int Init_ThMP3(void){
 //Inicializacion de la cola
 int Init_MsgQueue_Mp3(void) {
  
-  mid_MsgQueueMp3= osMessageQueueNew(4,sizeof(uint8_t), NULL);                                
+  mid_MsgQueueMp3= osMessageQueueNew(4,sizeof(t_comando), NULL);                                
   if (mid_MsgQueueMp3 == NULL) {
     return (-1);
   }
