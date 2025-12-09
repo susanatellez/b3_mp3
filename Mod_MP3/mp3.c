@@ -77,11 +77,14 @@ void MP3 (void *argument){
   osDelay(100);
   
   while(1){
+
   osMessageQueueGet(mid_MsgQueueMp3,&msg,NULL,osWaitForever);
   com = msg.com;
   dato1 = msg.dat1;
   dato2 = msg.dat2;
   MandarComando(com,dato1,dato2);
+  
+  
 //  switch(msg){
 
 //      case 0x01:
@@ -149,13 +152,14 @@ void MandarComando(uint8_t comm, uint8_t dato_1, uint8_t dato_2){
   buff[1] = 0xFF;//BYTE DE VERSION
   buff[2] = 0x06;//LONGITUD DEL COMANDO SIN BYTE DE START Y END
   buff[3] = comm; //COMANDO
-  buff[4] = 0x01;//Byte de feedback, si hiciera falta activarlo poner a 0x01
+  buff[4] = 0x00;//Byte de feedback, si hiciera falta activarlo poner a 0x01
   buff[5] = dato_1;
   buff[6] = dato_2;
   buff[7] = 0xEF; //BYTE DE END
   
   USARTdrv2->Send(buff,sizeof(buff));
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
+  osDelay(20);
 }
 
 void USART_Callback(uint32_t event){

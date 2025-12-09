@@ -28,16 +28,20 @@ void thTestMp3 (void *argument){
     //Volumen al maximo
     msg.com = 0x06;
     msg.dat1= 0x00;
-    msg.dat2= 0x1E;
+    msg.dat2= 0x05;
     osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
-    osDelay(100);
+    osDelay(1000);
     //Manda la primera cancion
+    msg.com = 0x03;
+    msg.dat1= 0x00;
+    msg.dat2= 0x01;
+    osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
+    osDelay(10000);
     msg.com = 0x03;
     msg.dat1= 0x00;
     msg.dat2= 0x02;
     osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
-   
-    osDelay(1000);
+    osDelay(10000);
     //Pone pausa
     msg.com = 0x0E;
     msg.dat1= 0x00;
