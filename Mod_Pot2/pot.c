@@ -53,7 +53,7 @@ void initModPOT (void){
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  //Inicialización del ACD
+  //Inicialización del ADC
   ADC_Init_Single_Conversion(&adchandle, ADC1);
 
   //Inicialización de la cola
@@ -84,8 +84,8 @@ void ThPOT (void *argument){
 
   while (1) {
     value = ADC_getVoltage(&adchandle, 10); // El ADC solo conoce canales por eso le pasamos el CN10
-    MsgQueue_POT = (uint8_t)((value / (VREF-0.15) * 100.0f)-4);
-    //En nuestra placa va del 0.14 al 3.29 de manera que se ve 3-99 por eso las cuentas se ven RARUNAS
+    MsgQueue_POT = (uint8_t)(value / (VREF-0.12) * 30.0f);
+    //En nuestra placa va del 0.14 al 3.29   de manera que se ve 3-99 por eso las cuentas se ven RARUNAS
     statusQueuePOT = osMessageQueuePut(mid_MsgQueue_POT, &MsgQueue_POT, NULL, 10U);
     osDelay(1000);
   }
@@ -128,7 +128,6 @@ float ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel) {
     sConfig.Channel = Channel;//canal por el que queremos leer
     sConfig.Rank = 1; //Posición en la secuencia de conversiones, aquí la primera y única
     sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;//cuánto tiempo el ADC “muestra” la señal antes de convertir
-    //si ves valores inestables aumenta a 15/28/56 ciclosssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
 
     if (HAL_ADC_ConfigChannel(hadc, &sConfig) != HAL_OK) { //configura el canal en el ADC
       return -1;
@@ -136,7 +135,7 @@ float ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel) {
 
     HAL_ADC_Start(hadc); //Inicia conversión por software
 
-    do//CREO QUE LO DE HACER LA CALLBACK ES POR AQUÍIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIi
+    do
         status = HAL_ADC_PollForConversion(hadc, 0); 
     while (status != HAL_OK);
 

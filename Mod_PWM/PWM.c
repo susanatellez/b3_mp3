@@ -20,7 +20,7 @@ void ThPWM (void *argument);
 
 // TIMER
 TIM_HandleTypeDef tim1;                                                         //
-static void InitTimer1(void);                                                   //CONFIGURACIO E INICIALIZACION TIMER
+ void InitTimer1(void);                                                   //CONFIGURACIO E INICIALIZACION TIMER
 
 // COLA DE MENSAJES
 /* Thread a la espera de cola de mensajes que indique que hay que 
@@ -115,7 +115,7 @@ void ThPWM (void *argument){
 }
 
 
-static void InitTimer1(void){
+void InitTimer1(void){
   
   TIM_OC_InitTypeDef TIM_Channel_InitStruct;                                    //
   

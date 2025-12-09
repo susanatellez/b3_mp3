@@ -114,7 +114,7 @@ int main(void)
 
   /* Add your application code here */
   //Inicializo el timer
-  InitTimer1();
+
 
 #ifdef RTE_CMSIS_RTOS2
   /* Initialize CMSIS-RTOS2 */

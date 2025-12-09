@@ -21,38 +21,38 @@ int InitTestMp3 (void){
 
 
 void thTestMp3 (void *argument){
-  
-
-
-  while(1){
-    //Volumen al maximo
+      //Volumen al maximo
     msg.com = 0x06;
     msg.dat1= 0x00;
-    msg.dat2= 0x05;
+    msg.dat2= 0x10;
     osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
     osDelay(1000);
     //Manda la primera cancion
-    msg.com = 0x03;
-    msg.dat1= 0x00;
+    msg.com = 0x0F;
+    msg.dat1= 0x01;
     msg.dat2= 0x01;
     osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
-    osDelay(10000);
-    msg.com = 0x03;
-    msg.dat1= 0x00;
-    msg.dat2= 0x02;
-    osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
-    osDelay(10000);
-    //Pone pausa
-    msg.com = 0x0E;
+    osDelay(20000);
+
+
+  while(1){
+
+    msg.com = 0x01;
     msg.dat1= 0x00;
     msg.dat2= 0x00;
     osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
-    osDelay(10000);
-    //Da al play
-    msg.com = 0x0D;
-    msg.dat1= 0x00;
-    msg.dat2= 0x00;
-    osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
-    osDelay(10000);
+    osDelay(20000);
+//    //Pone pausa
+//    msg.com = 0x0E;
+//    msg.dat1= 0x00;
+//    msg.dat2= 0x00;
+//    osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
+//    osDelay(10000);
+//    //Da al play
+//    msg.com = 0x0D;
+//    msg.dat1= 0x00;
+//    msg.dat2= 0x00;
+//    osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
+//    osDelay(10000);
   }
 }
