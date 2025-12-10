@@ -6,6 +6,4 @@
 
 void initModPWM (void);
 
-void InitTimer1(void);
-
 #endif
