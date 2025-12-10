@@ -29,8 +29,8 @@ void thTestMp3 (void *argument){
     osDelay(1000);
     //Manda la primera cancion
     msg.com = 0x0F;
-    msg.dat1= 0x01;
-    msg.dat2= 0x01;
+    msg.dat1= 0x02;
+    msg.dat2= 0x03;
     osMessageQueuePut(mid_MsgQueueMp3, &msg, 0, 0);
     osDelay(20000);
 

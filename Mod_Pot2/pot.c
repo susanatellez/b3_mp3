@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "pot.h"                                                                //
-
+#include "math.h"
 /*******************************************************************************
  * MODULO POT
  * ADC (Analog-to-Digital Converter, convertidor analógico-digital)
@@ -25,7 +25,7 @@ int Init_ThPOT (void);
 
 static ADC_HandleTypeDef adchandle; // handle inicializado y usado para las operaciones ADC
 float value;
-
+float redondeado;
 void ThPOT (void *argument);
 
 //Para inicializar el ADC_HandlerTypeDef                                        //estan en el .H
@@ -81,13 +81,19 @@ int Init_ThPOT (void){
 
 
 void ThPOT (void *argument){
+  uint8_t msg_ant = 0x00;
 
   while (1) {
     value = ADC_getVoltage(&adchandle, 10); // El ADC solo conoce canales por eso le pasamos el CN10
-    MsgQueue_POT = (uint8_t)((value-0.15) / (3.26-0.15) * 30.0f);
+    redondeado = ((int)(value*100))/100.0f;
+    MsgQueue_POT = (uint8_t)((redondeado-0.15) / (3.26-0.15) * 30.0f);
+    if(msg_ant != MsgQueue_POT){
     //En nuestra placa va del 0.14 al 3.29   de manera que se ve 3-99 por eso las cuentas se ven RARUNAS
     statusQueuePOT = osMessageQueuePut(mid_MsgQueue_POT, &MsgQueue_POT, NULL, 10U);
     osDelay(1000);
+     msg_ant = MsgQueue_POT;
+    }
+
   }
 
 }
