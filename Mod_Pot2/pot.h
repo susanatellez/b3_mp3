@@ -7,8 +7,4 @@
 
 void initModPOT (void);
 
-// Prototipos de funciones
-int ADC_Init_Single_Conversion(ADC_HandleTypeDef *hadc, ADC_TypeDef *ADC_Instance);
-float ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel);
-
 #endif

@@ -12,8 +12,8 @@
  * micro pueda “leer” sensores/potenciómetros que entregan voltaje
  *******************************************************************************/
 
-#define VREF 3.3f                                                               //Nosostros lo hemos conectado al típico
-#define RESOLUTION_12B 4096.0f
+#define VREF 3300                                                               //Nosostros lo hemos conectado al típico
+#define RESOLUTION_12B 4096
 
 static GPIO_InitTypeDef GPIO_InitStruct;                                        //
 //static void initModPOT (void);                                                //está en el .H
@@ -24,21 +24,22 @@ uint32_t statusQueuePOT = 0x0000;
 int Init_ThPOT (void);
 
 static ADC_HandleTypeDef adchandle; // handle inicializado y usado para las operaciones ADC
-float value;
-float redondeado;
+uint16_t value;
+
 void ThPOT (void *argument);
 
 //Para inicializar el ADC_HandlerTypeDef                                        //estan en el .H
-//int ADC_Init_Single_Conversion(ADC_HandleTypeDef *hadc, ADC_TypeDef *ADC_Instance);
+int ADC_Init_Single_Conversion(ADC_HandleTypeDef *hadc, ADC_TypeDef *ADC_Instance);
 //Para leer un canal y devolver el voltaje en float
-//float ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel);
+int ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel);
 
 // QUEUE
 osMessageQueueId_t mid_MsgQueue_POT;
 uint8_t MsgQueue_POT = 0x00;                                                    //mensaje de metes a la cola
 int Init_MsgQueue_POT(void);
 
-
+uint32_t raw = 0;
+ uint16_t voltage = 0;//valor convertio a voltios
 void initModPOT (void){
 
   //ADC1_pins_F429ZI_config(){... funciónd e configuración de los pines
@@ -85,8 +86,8 @@ void ThPOT (void *argument){
 
   while (1) {
     value = ADC_getVoltage(&adchandle, 10); // El ADC solo conoce canales por eso le pasamos el CN10
-    redondeado = ((int)(value*100))/100.0f;
-    MsgQueue_POT = (uint8_t)((redondeado-0.15) / (3.26-0.15) * 30.0f);
+   // redondeado = ((int)(value*100))/100.0f;
+    MsgQueue_POT = value*0.009375;
     if(msg_ant != MsgQueue_POT){
     //En nuestra placa va del 0.14 al 3.29   de manera que se ve 3-99 por eso las cuentas se ven RARUNAS
     statusQueuePOT = osMessageQueuePut(mid_MsgQueue_POT, &MsgQueue_POT, NULL, 10U);
@@ -125,11 +126,11 @@ int ADC_Init_Single_Conversion(ADC_HandleTypeDef *hadc, ADC_TypeDef *ADC_Instanc
 }
 
 
-float ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel) {
+int ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel) {
     ADC_ChannelConfTypeDef sConfig = {0}; //Estructura local para la configuración del canal ADC; inicializada a 0
     HAL_StatusTypeDef status;
-    uint32_t raw = 0; //valor devuelto por el ADC
-    float voltage = 0;//valor convertio a voltios
+     //valor devuelto por el ADC
+   
 
     sConfig.Channel = Channel;//canal por el que queremos leer
     sConfig.Rank = 1; //Posición en la secuencia de conversiones, aquí la primera y única
