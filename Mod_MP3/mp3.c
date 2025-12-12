@@ -18,13 +18,15 @@ int Init_ThMP3(void);
 void MP3 (void *argument);
 int Init_MsgQueue_Mp3(void);
 void MandarComando(uint8_t comm, uint8_t dato_1, uint8_t dato_2);
+uint8_t comprobarEstadoTarjeta();
+uint8_t getInfoMp3(uint8_t);
 //Hilo y cola:
 osThreadId_t tid_ThMp3;                        // thread id
 osMessageQueueId_t  mid_MsgQueueMp3;
 
 //Comandos
 
-
+  uint8_t buffRx[10] = {0};
 //Driver
 extern ARM_DRIVER_USART Driver_USART2;
 ARM_DRIVER_USART *USARTdrv2 = &Driver_USART2;
@@ -72,17 +74,20 @@ void MP3 (void *argument){
   USARTdrv2->Control(ARM_USART_CONTROL_TX,1);
 
   //Inicializacion para elegir la tarjeta sd
-  
+  comprobarEstadoTarjeta();
   MandarComando(9,0,2);
+
   osDelay(100);
   
   while(1){
-
-  osMessageQueueGet(mid_MsgQueueMp3,&msg,NULL,osWaitForever);
+  comprobarEstadoTarjeta();
+  if(osMessageQueueGet(mid_MsgQueueMp3,&msg,NULL,10U)==osOK){
   com = msg.com;
   dato1 = msg.dat1;
   dato2 = msg.dat2;
   MandarComando(com,dato1,dato2);
+  };
+
   
   
 //  switch(msg){
@@ -160,6 +165,44 @@ void MandarComando(uint8_t comm, uint8_t dato_1, uint8_t dato_2){
   USARTdrv2->Send(buff,sizeof(buff));
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   osDelay(20);
+}
+
+
+uint8_t getInfoMp3(uint8_t cmd){
+  uint8_t buffRx2[10] = {0};
+  uint8_t buffCMD[8] ={0};
+  buffCMD[0] = 0x7E;//BYTE DE START
+  buffCMD[1] = 0xFF;//BYTE DE VERSION
+  buffCMD[2] = 0x06;//LONGITUD DEL COMANDO SIN BYTE DE START Y END
+  buffCMD[3] = cmd; //COMANDO
+  buffCMD[4] = 0x00;//Byte de feedback, si hiciera falta activarlo poner a 0x01
+  buffCMD[5] = 0x00;
+  buffCMD[6] = 0x00;
+  buffCMD[7] = 0xEF; //BYTE DE END
+  
+  
+  USARTdrv2->Send(buffCMD,sizeof(buffCMD));
+  osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
+  
+  USARTdrv2->Receive(buffRx2,sizeof(buffRx));
+  osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
+
+   return  buffRx2[6];
+  
+
+}
+
+uint8_t comprobarEstadoTarjeta(){
+  uint8_t insertado = 0;
+  USARTdrv2->Receive(buffRx,sizeof(buffRx));
+  osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
+  
+  if (buffRx[3]== 0x3A){//Tarjeta insertada
+    insertado = 1;
+  }else if(buffRx[3] == 0x3B){//Tarjeta no insertada
+    insertado = 0;
+  }
+  return insertado;
 }
 
 void USART_Callback(uint32_t event){
