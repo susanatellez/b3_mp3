@@ -28,11 +28,13 @@ void ThPrincipal (void *argument);
 extern osMessageQueueId_t mid_MsgQueue_Joy;                                     //faltan los demás
 extern osMessageQueueId_t mid_MsgQueue_POT;
 extern osMessageQueueId_t mid_MsgQueueTemp;
+extern osMessageQueueId_t mid_MsgQueueMp3;                                      //FALTA mod MP3
 
 //COLAS DEL H-PRINCIPAL ASOCIADAS A LOS MÓDULOS
 uint8_t msgJoy = 0x00;
 uint8_t msgPot = 0x00;
 float msgTemp = 0x00;
+t_comando msgMP3;                                                               //FALTA mod MP3
 
 int Init_ThPrincipal (void){ //Inicializamos hilo y cola
   
@@ -76,6 +78,8 @@ void ThPrincipal (void *argument){
           case EV_JOY:
             evento = 0x00; //borramos flag
             if(msgJoy == 0x50){
+              //AÑADIR WAKE UP/SLEEP
+              //
               modo_actual = MODO_HORA;
             }
             break;
@@ -83,6 +87,7 @@ void ThPrincipal (void *argument){
             
             break;
         }
+        
         break;                                                                  //FIN modo reproducción
         
       case MODO_HORA :                                                          //MODO_HORA

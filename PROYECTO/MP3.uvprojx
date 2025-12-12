@@ -411,19 +411,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Joystick</GroupName>
-          <Files>
-            <File>
-              <FileName>joystick.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\joystick.c</FilePath>
-            </File>
-            <File>
-              <FileName>joystick.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\joystick.h</FilePath>
-            </File>
-          </Files>
+          <GroupName>Hora</GroupName>
         </Group>
         <Group>
           <GroupName>Temperatura</GroupName>
@@ -441,6 +429,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Joystick</GroupName>
+          <Files>
+            <File>
+              <FileName>joystick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\joystick.c</FilePath>
+            </File>
+            <File>
+              <FileName>joystick.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\joystick.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>Potenciometro</GroupName>
           <Files>
             <File>
@@ -454,6 +457,21 @@
               <FilePath>.\pot.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+        </Group>
+        <Group>
+          <GroupName>PWM_output</GroupName>
+        </Group>
+        <Group>
+          <GroupName>led_RGB</GroupName>
+        </Group>
+        <Group>
+          <GroupName>COM-PC</GroupName>
+        </Group>
+        <Group>
+          <GroupName>MP3player</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
