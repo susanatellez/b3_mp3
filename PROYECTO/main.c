@@ -41,6 +41,9 @@
 #include "main.h"
 
 #include "principal.h"                                                          //FALTAN TODOS LOS DEMÁS .H
+#include "joystick.h"
+#include "temp.h"
+#include "pot.h"
 
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
@@ -121,7 +124,6 @@ int main(void)
   /* Create thread functions that start executing */
   
   Init_ThPrincipal();                                                           //creo que este habrá qu eponerlo al final
-  Init_MsgQueue_Principal();                                                    //
 
   /* Start thread execution */
   osKernelStart();

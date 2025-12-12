@@ -42,6 +42,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx_it.h"
+#include "joystick.h"                                                           //
 
 #ifdef _RTE_
 #include "RTE_Components.h"             /* Component selection */
@@ -59,9 +60,45 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-
+extern osThreadId_t tid_joy;
 /* Private function prototypes -----------------------------------------------*/
+void EXTI15_10_IRQHandler(void);                                                //
+
 /* Private functions ---------------------------------------------------------*/
+void EXTI15_10_IRQHandler(void){                                                //
+
+  //Puerto B
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);                                        // RIGHT
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);                                        // UP
+
+  //Puerto E
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);                                        // DOWN
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);                                        // LEFT
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);                                        // CENTER
+
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+
+  //Guardamos pin presionado
+  pin_presionado.pin = GPIO_Pin;
+  if (GPIO_Pin == GPIO_PIN_10 || GPIO_Pin == GPIO_PIN_11){
+    pin_presionado.port = GPIOB;
+  } else {
+    pin_presionado.port = GPIOE;
+  }
+
+  //VEMOS SI ES UN FLANCO DE SUBIDA O BAJADA
+   GPIO_PinState state = HAL_GPIO_ReadPin(pin_presionado.port, pin_presionado.pin);
+  if (state == GPIO_PIN_SET) {
+    // Flanco de subida
+    osThreadFlagsSet(tid_joy, 0x1000);
+  } else {
+    // Flanco de bajada
+    osThreadFlagsSet(tid_joy, 0x0001);
+  }
+
+}
 
 /******************************************************************************/
 /*            Cortex-M4 Processor Exceptions Handlers                         */

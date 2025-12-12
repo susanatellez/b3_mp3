@@ -426,6 +426,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Temperatura</GroupName>
+          <Files>
+            <File>
+              <FileName>temp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\temp.c</FilePath>
+            </File>
+            <File>
+              <FileName>temp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\temp.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Potenciometro</GroupName>
+          <Files>
+            <File>
+              <FileName>pot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\pot.c</FilePath>
+            </File>
+            <File>
+              <FileName>pot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\pot.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>

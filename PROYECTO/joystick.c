@@ -1,9 +1,8 @@
-#include "cmsis_os2.h"                                                          // CMSIS RTOS header file
+#include "cmsis_os2.h"        // CMSIS RTOS header file
 #include "stm32f4xx_hal.h"
 #include <stdlib.h>
 
 #include "joystick.h"                                                           //
-#include "principal.h"                                                          //
 
 /*******************************************************************************
 MODULO JOYSTICK: encargado de detectar e identificar una pulsación en el joystick
@@ -15,7 +14,7 @@ static GPIO_InitTypeDef GPIO_InitStruct;                                        
 //static void initModJoy (void);                                                //el .H
 
 // HILO DEL JOYSTICK
-osThreadId_t tid_joy;
+osThreadId_t tid_joy;                                                           //no me va si lo muevo al .H
 uint32_t statusJoy = 0x0000;
 int Init_ThJoy (void);
 void ThJoy (void *argument);
@@ -46,10 +45,9 @@ int Init_timerJoyRebotesBajada (void);
 void TimerJoyRebotesBajada_Callback(void *arg);
 
 // QUEUE
-extern osMessageQueueId_t mid_MsgQueue_Principal;                               //AHORA METEMOS LOS MENSAJES A LA COLA DEL HILO PRINCIPAL
-//osMessageQueueId_t mid_MsgQueue_Joy;
+osMessageQueueId_t mid_MsgQueue_Joy;
 uint8_t MsgQueue_Joy = 0x00;                                                    //mensaje de metes a la cola
-//int Init_MsgQueue_Joy(void);
+int Init_MsgQueue_Joy(void);
 
 
 /* INICIALIZACIÓN MÓDULO DEL JOYSTICK 
@@ -95,7 +93,7 @@ void initModJoy (void) {
   Init_timerJoyRebotesBajada();
   
   //inicializo cola de mesnsajes (desde aquí envío)
-//  Init_MsgQueue_Joy(); //ESTA COLA YA NO LA NECESITAMOS
+  Init_MsgQueue_Joy();
 
 }
 
@@ -159,7 +157,7 @@ int Init_timerJoyRebotes (void){
 }
 
 
-void TimerJoyRebotes_Callback(void *arg){ //para REBOTES, flanco de subida
+void TimerJoyRebotes_Callback(void *arg){                                       //para REBOTES, flanco de subida
 
   if (HAL_GPIO_ReadPin(pin_presionado.port, pin_presionado.pin)){
     osTimerStart(timerJoyPulsacionLarga, 950U);
@@ -184,7 +182,7 @@ int Init_timerJoyRebotesBajada (void){
 }
 
 
-void TimerJoyRebotesBajada_Callback(void *arg){  //para el timer de BAJADA
+void TimerJoyRebotesBajada_Callback(void *arg){                                 //para el timer de BAJADA
 
   if (HAL_GPIO_ReadPin(pin_presionado.port, pin_presionado.pin)==0){
     if (osTimerIsRunning(timerJoyPulsacionLarga)) {
@@ -197,23 +195,23 @@ void TimerJoyRebotesBajada_Callback(void *arg){  //para el timer de BAJADA
       switch(pin_activo){ //depende del pin presionado enviamos un mensaje u otro
         case GPIO_PIN_11:
           MsgQueue_Joy = 0x02;
-          osMessageQueuePut(mid_MsgQueue_Principal, &MsgQueue_Joy, 0U, 0U);
+          osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
           break;
         case GPIO_PIN_10:
           MsgQueue_Joy = 0x01;
-          osMessageQueuePut(mid_MsgQueue_Principal, &MsgQueue_Joy, 0U, 0U);
+          osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
           break;
         case GPIO_PIN_12:
           MsgQueue_Joy = 0x03;
-          osMessageQueuePut(mid_MsgQueue_Principal, &MsgQueue_Joy, 0U, 0U);
+          osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
           break;
         case GPIO_PIN_14:
           MsgQueue_Joy = 0x04;
-          osMessageQueuePut(mid_MsgQueue_Principal, &MsgQueue_Joy, 0U, 0U);
+          osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
           break;
         case GPIO_PIN_15:
           MsgQueue_Joy = 0x05;
-          osMessageQueuePut(mid_MsgQueue_Principal, &MsgQueue_Joy, 0U, 0U);
+          osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
           break;
         default: break;
       } //fin del switch
@@ -249,23 +247,23 @@ void TimerJoyPulsacionLarga_Callback(void *arg){
   switch(pin_activo){ //depende del pin presionado enviamos un mensaje u otro
     case GPIO_PIN_11:
       MsgQueue_Joy = 0x20;
-      osMessageQueuePut(mid_MsgQueue_Principal, &MsgQueue_Joy, 0U, 0U);
+      osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
       break;
     case GPIO_PIN_10:
       MsgQueue_Joy = 0x10;
-      osMessageQueuePut(mid_MsgQueue_Principal, &MsgQueue_Joy, 0U, 0U);
+      osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
       break;
     case GPIO_PIN_12:
       MsgQueue_Joy = 0x30;
-      osMessageQueuePut(mid_MsgQueue_Principal, &MsgQueue_Joy, 0U, 0U);
+      osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
       break;
     case GPIO_PIN_14:
       MsgQueue_Joy = 0x40;
-      osMessageQueuePut(mid_MsgQueue_Principal, &MsgQueue_Joy, 0U, 0U);
+      osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
       break;
     case GPIO_PIN_15:
       MsgQueue_Joy = 0x50;
-      osMessageQueuePut(mid_MsgQueue_Principal, &MsgQueue_Joy, 0U, 0U);
+      osMessageQueuePut(mid_MsgQueue_Joy, &MsgQueue_Joy, 0U, 0U);
       break;
     default: break;
   }
@@ -273,12 +271,12 @@ void TimerJoyPulsacionLarga_Callback(void *arg){
 }
 
 
-//int Init_MsgQueue_Joy(void){
+int Init_MsgQueue_Joy(void){
 
-//  mid_MsgQueue_Joy = osMessageQueueNew(16, sizeof(uint8_t), NULL);
-//  if (mid_MsgQueue_Joy == NULL) {
-//    return (-1);
-//  }
-//  return(0);
+  mid_MsgQueue_Joy = osMessageQueueNew(16, sizeof(uint8_t), NULL);
+  if (mid_MsgQueue_Joy == NULL) {
+    return (-1);
+  }
+  return(0);
 
-//}
+}
