@@ -50,3 +50,7 @@ Mod_MP3/EventRecorderStub.scvd
 Mod_MP3/ModMp3.uvguix.susan
 Mod_MP3/ModMp3.uvoptx
 
+# para Mod_MP3
+PROYECTO/EventRecorderStub.scvd
+PROYECTO/MP3.uvguix.susan
+PROYECTO/MP3.uvoptx
