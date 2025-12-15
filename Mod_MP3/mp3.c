@@ -11,30 +11,44 @@
 //--------------------------------------MP3-------------------------------------
 //******************************************************************************
 
-
-//CABECERAS:
-void USART_Callback(uint32_t event);
-int Init_ThMP3(void);
-void MP3 (void *argument);
-int Init_MsgQueue_Mp3(void);
-void MandarComando(uint8_t comm, uint8_t dato_1, uint8_t dato_2);
-uint8_t comprobarEstadoTarjeta();
-uint8_t getInfoMp3(uint8_t);
-//Hilo y cola:
-osThreadId_t tid_ThMp3;                        // thread id
-osMessageQueueId_t  mid_MsgQueueMp3;
-
-//Comandos
-
-  uint8_t buffRx[10] = {0};
-//Driver
+//DRIVER
 extern ARM_DRIVER_USART Driver_USART2;
 ARM_DRIVER_USART *USARTdrv2 = &Driver_USART2;
 
+//HILO
+osThreadId_t tid_ThMp3;                        // thread id
+int Init_ThMP3(void);
+void MP3 (void *argument);
+void USART_Callback(uint32_t event);
+
+//COLA
+osMessageQueueId_t  mid_MsgQueueMp3;      //de aquí extraeremos
+osMessageQueueId_t  mid_MsgQueueMp3Info; //en esta metemos mensajes
+int Init_MsgQueue_Mp3(void);
+int Init_MsgQueue_Mp3_Info(void);
+
+//FUNCIONES AUXILIARES
+void MandarComando(uint8_t comm, uint8_t dato_1, uint8_t dato_2);
+uint8_t comprobarEstadoTarjeta();
+uint8_t getInfoMp3(uint8_t);
+
+
+//Comandos
+uint32_t statusGet = 0;
+t_comando msg;              //mensaje que recibes
+t_respuesta msg_respuesta; //la que envias
+
+
+uint8_t buffTx[8] = {0};  //MANDAR COMANDO
+uint8_t buffCMD[8] = {0}; //MANDA COMANDO ESPERANDO RESPUESTA
+uint8_t buffRx[10] = {0}; //RECIBE RESPUESTA
+
+
 //Inicialización del módulo
 void Init_ModMP3 (void){
-  Init_ThMP3();
   Init_MsgQueue_Mp3();
+  Init_MsgQueue_Mp3_Info();
+  Init_ThMP3();
 }
 
 //Inicialización del hilo
@@ -43,16 +57,20 @@ int Init_ThMP3(void){
   if (tid_ThMp3 == NULL) {
     return(-1);
   }
- 
   return(0);
-
 }
 
 //Inicializacion de la cola
 int Init_MsgQueue_Mp3(void) {
- 
-  mid_MsgQueueMp3= osMessageQueueNew(4,sizeof(t_comando), NULL);                                
+  mid_MsgQueueMp3= osMessageQueueNew(4,sizeof(t_comando), NULL);
   if (mid_MsgQueueMp3 == NULL) {
+    return (-1);
+  }
+  return(0);
+}
+int Init_MsgQueue_Mp3_Info(void) {
+  mid_MsgQueueMp3Info= osMessageQueueNew(4,sizeof(t_respuesta), NULL);
+  if (mid_MsgQueueMp3Info == NULL) {
     return (-1);
   }
   return(0);
@@ -61,10 +79,8 @@ int Init_MsgQueue_Mp3(void) {
 
 //FUNCION DEL HILO
 void MP3 (void *argument){
-  uint8_t com;
-  uint8_t dato1;
-  uint8_t dato2;
-  t_comando msg;
+
+  uint8_t estado_tarjeta = 0;
   //INICIALIZACION UART
   USARTdrv2->Initialize(USART_Callback);
   USARTdrv2->PowerControl(ARM_POWER_FULL);
@@ -74,103 +90,61 @@ void MP3 (void *argument){
   USARTdrv2->Control(ARM_USART_CONTROL_TX,1);
 
   //Inicializacion para elegir la tarjeta sd
-  comprobarEstadoTarjeta();
   MandarComando(9,0,2);
-
   osDelay(100);
   
   while(1){
-  comprobarEstadoTarjeta();
-  if(osMessageQueueGet(mid_MsgQueueMp3,&msg,NULL,10U)==osOK){
-  com = msg.com;
-  dato1 = msg.dat1;
-  dato2 = msg.dat2;
-  MandarComando(com,dato1,dato2);
-  };
 
-  
-  
-//  switch(msg){
+    uint8_t nuevo_estado = comprobarEstadoTarjeta();
+    if(estado_tarjeta != nuevo_estado){
+      estado_tarjeta = nuevo_estado;
+      msg_respuesta.tipo = 0;
+      msg_respuesta.info = nuevo_estado;
+      osMessageQueuePut(mid_MsgQueueMp3Info, &msg_respuesta,0,0);
+    }
 
-//      case 0x01:
-//        comando(msg,0x00,0x00);//Siguiente cancion
-//      break;
-//      case 0x02:
-//        comando(msg,0x00,0x00);//Cancion anterior
-//      break;
-//      case 0x03:
-//        comando(msg,0x00,0x01);//Poner cancion con indice (el indice es el pasado en dato2)
-//      break;
-//      case 0x04:
-//        comando(msg,0x00,0x00);//Subir volumen
-//      break;
-//      case 0x05:
-//        comando(msg,0x00,0x00);//Bajar volumen
-//      break;
-//      case 0x06:
-//        comando(msg,0x00,0x1E);//Poner volumen al maximo 1E = volumen al 30 (maximo)
-//      break;
-//      case 0x08:
-//        comando(msg,0x00,0x01);//Poner la primera cancion
-//      break;
-//      case 0x09:
-//        comando(msg,0x00,0x02);//Seleccionar dispositivo de almacenamiento
-//      break;
-//      case 0x0A:
-//        comando(msg,0x00,0x00);//Sleep mode
-//      break;
-//      case 0x0B:
-//        comando(msg,0x00,0x00);//Despertar
-//      break;
-//      case 0x0C:
-//        comando(msg,0x00,0x00);//Reset
-//      break;
-//      case 0x0D:
-//        comando(msg,0x00,0x00);//Play
-//      break;
-//      case 0x0E:
-//        comando(msg,0x00,0x00);//Pausa
-//      break;
-//      case 0x0F:
-//        comando(msg,0x01,0x01);//Poner la cancion en el diorectorio /01/001.mp3
-//      break;
-//      case 0x16:
-//        comando(msg,0x00,0x00);//Parar
-//      break;
-//      case 0x17:
-//        comando(msg,0x01,0x02);//Reproducir carpeta 01
-//      break;
-//      case 0x19:
-//        comando(msg,0x00,0x00);//Empezar ciclo de reproduccion 0x01 para parar
-//      break;
-//    default:
-//      break;
-//  
-//  }
+    statusGet = osMessageQueueGet(mid_MsgQueueMp3,&msg,NULL,10U);
+  if(statusGet == osOK){
+    statusGet = 0;
+    switch(msg.tipo){
+      case 0:
+      MandarComando(msg.com,msg.dat1,msg.dat2);
+      osDelay(20);
+      break;
+      case 1:
+      msg_respuesta.tipo = msg.com;
+      msg_respuesta.info = getInfoMp3(msg.com);
+      osMessageQueuePut(mid_MsgQueueMp3Info, &msg_respuesta,0,0);
+      break;
+    }
+
+  }
+
+
   }
 }
 
-//Funcion constructora de comando
-void MandarComando(uint8_t comm, uint8_t dato_1, uint8_t dato_2){
-  uint8_t buff[8] = {0};
-  buff[0] = 0x7E;//BYTE DE START
-  buff[1] = 0xFF;//BYTE DE VERSION
-  buff[2] = 0x06;//LONGITUD DEL COMANDO SIN BYTE DE START Y END
-  buff[3] = comm; //COMANDO
-  buff[4] = 0x00;//Byte de feedback, si hiciera falta activarlo poner a 0x01
-  buff[5] = dato_1;
-  buff[6] = dato_2;
-  buff[7] = 0xEF; //BYTE DE END
+void MandarComando(uint8_t comm, uint8_t dato_1, uint8_t dato_2){ //Funcion constructora de comando
+ //buffer que mandas cuando quieres que haga X
+
+  buffTx[0] = 0x7E;//BYTE DE START
+  buffTx[1] = 0xFF;//BYTE DE VERSION
+  buffTx[2] = 0x06;//LONGITUD DEL COMANDO SIN BYTE DE START Y END
+  buffTx[3] = comm; //COMANDO
+  buffTx[4] = 0x00;//Byte de feedback, si hiciera falta activarlo poner a 0x01
+  buffTx[5] = dato_1;
+  buffTx[6] = dato_2;
+  buffTx[7] = 0xEF; //BYTE DE END
   
-  USARTdrv2->Send(buff,sizeof(buff));
+  USARTdrv2->Send(buffTx,sizeof(buffTx));
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   osDelay(20);
 }
 
 
 uint8_t getInfoMp3(uint8_t cmd){
-  uint8_t buffRx2[10] = {0};
-  uint8_t buffCMD[8] ={0};
+
+
   buffCMD[0] = 0x7E;//BYTE DE START
   buffCMD[1] = 0xFF;//BYTE DE VERSION
   buffCMD[2] = 0x06;//LONGITUD DEL COMANDO SIN BYTE DE START Y END
@@ -184,25 +158,27 @@ uint8_t getInfoMp3(uint8_t cmd){
   USARTdrv2->Send(buffCMD,sizeof(buffCMD));
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   
-  USARTdrv2->Receive(buffRx2,sizeof(buffRx));
+  USARTdrv2->Receive(buffRx,sizeof(buffRx));
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
 
-   return  buffRx2[6];
-  
+  osDelay(10);
+  return  buffRx[6];
 
 }
 
 uint8_t comprobarEstadoTarjeta(){
-  uint8_t insertado = 0;
+  uint8_t estadoTarjeta = 0;
   USARTdrv2->Receive(buffRx,sizeof(buffRx));
-  osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
+  osThreadFlagsWait(0x01, osFlagsWaitAny,10U);
   
   if (buffRx[3]== 0x3A){//Tarjeta insertada
-    insertado = 1;
+    estadoTarjeta = 1;
   }else if(buffRx[3] == 0x3B){//Tarjeta no insertada
-    insertado = 0;
+    estadoTarjeta = 0;
+  }else if(buffRx[3] == 0x40){//file not found
+    estadoTarjeta = 2;
   }
-  return insertado;
+  return estadoTarjeta;
 }
 
 void USART_Callback(uint32_t event){
