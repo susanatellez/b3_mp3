@@ -411,7 +411,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Joystick</GroupName>
+          <GroupName>JOY</GroupName>
           <Files>
             <File>
               <FileName>joystick.c</FileName>
@@ -422,6 +422,101 @@
               <FileName>joystick.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\joystick.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>TEMP</GroupName>
+          <Files>
+            <File>
+              <FileName>temp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\temp.c</FilePath>
+            </File>
+            <File>
+              <FileName>temp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\temp.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>POT2</GroupName>
+          <Files>
+            <File>
+              <FileName>pot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\pot.c</FilePath>
+            </File>
+            <File>
+              <FileName>pot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\pot.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>MP3</GroupName>
+          <Files>
+            <File>
+              <FileName>mp3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\mp3.c</FilePath>
+            </File>
+            <File>
+              <FileName>mp3.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\mp3.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\lcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>Arial12x12.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Arial12x12.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>PWM</GroupName>
+          <Files>
+            <File>
+              <FileName>PWM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\PWM.c</FilePath>
+            </File>
+            <File>
+              <FileName>PWM.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\PWM.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>RGB</GroupName>
+          <Files>
+            <File>
+              <FileName>rgb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\rgb.c</FilePath>
+            </File>
+            <File>
+              <FileName>rgb.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\rgb.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -30,7 +30,7 @@ const uint8_t addr = 0x48; //dirección I2C del sensor de temperatura
 const uint8_t reg_conf = 0x01;
 const uint8_t reg_temp = 0x00; //Dirección del registro de temperatura dentro del sensor
 
-
+uint32_t tiempo = 0;
 
 //------------------------Inicializacion del módulo-----------------------------
 void initModTemp (void){
@@ -78,6 +78,7 @@ void Temp (void *argument){
     if(medirTemp(&t) ==0){ //si ha medido la temperatura con éxito
       osMessageQueuePut(mid_MsgQueueTemp,&t,0,0);
     }
+    tiempo = (tiempo < 86400) ? tiempo+1 : 0;
    osDelay(1000);
   }
 }
