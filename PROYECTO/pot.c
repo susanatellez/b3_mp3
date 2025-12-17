@@ -31,7 +31,7 @@ void ThPOT (void *argument);
 //Para inicializar el ADC_HandlerTypeDef                                        //estan en el .H
 int ADC_Init_Single_Conversion(ADC_HandleTypeDef *hadc, ADC_TypeDef *ADC_Instance);
 //Para leer un canal y devolver el voltaje en float
-int ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel);
+uint16_t ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel);
 
 // QUEUE
 osMessageQueueId_t mid_MsgQueue_POT;
@@ -82,18 +82,22 @@ int Init_ThPOT (void){
 
 
 void ThPOT (void *argument){
-  uint8_t msg_ant = 0x00;
+  uint8_t msg_ant = 0xFF;
 
   while (1) {
     value = ADC_getVoltage(&adchandle, 10); // El ADC solo conoce canales por eso le pasamos el CN10
    // redondeado = ((int)(value*100))/100.0f;
-    MsgQueue_POT = value*0.009375;
+    MsgQueue_POT = (raw & 0xF80) >> 7;
+    
+    if (MsgQueue_POT > 30) MsgQueue_POT = 30; 
+    
     if(msg_ant != MsgQueue_POT){
     //En nuestra placa va del 0.14 al 3.29   de manera que se ve 3-99 por eso las cuentas se ven RARUNAS
     statusQueuePOT = osMessageQueuePut(mid_MsgQueue_POT, &MsgQueue_POT, NULL, 10U);
-    osDelay(1000);
+    
      msg_ant = MsgQueue_POT;
     }
+    osDelay(500);
 
   }
 
@@ -126,7 +130,7 @@ int ADC_Init_Single_Conversion(ADC_HandleTypeDef *hadc, ADC_TypeDef *ADC_Instanc
 }
 
 
-int ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel) {
+uint16_t ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel) {
     ADC_ChannelConfTypeDef sConfig = {0}; //Estructura local para la configuración del canal ADC; inicializada a 0
     HAL_StatusTypeDef status;
      //valor devuelto por el ADC
@@ -148,9 +152,9 @@ int ADC_getVoltage(ADC_HandleTypeDef *hadc, uint32_t Channel) {
 
     //EESTO ES LO IMPORTANTE
     raw = HAL_ADC_GetValue(hadc); //Lee el resultado del ADC
-    voltage = raw * VREF / RESOLUTION_12B; //lo convertimos a voltios
+    //voltage = raw * VREF / RESOLUTION_12B; //lo convertimos a voltios
 
-    return voltage;//devolvemos el valor en voltios
+    return raw;//devolvemos el valor en voltios
 }
 
 int Init_MsgQueue_POT(void){

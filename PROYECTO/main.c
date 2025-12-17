@@ -41,6 +41,15 @@
 #include "main.h"
 
 #include "principal.h"                                                          //FALTAN TODOS LOS DEMÁS .H
+#include "joystick.h"
+#include "temp.h"
+#include "pot.h"
+#include "mp3.h"
+#include "lcd.h"
+//#include "clock.h"
+#include "pwm.h"
+#include "rgb.h"
+
 
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
@@ -95,7 +104,7 @@ static void Error_Handler(void);
   * @retval None
   */
 int main(void)
-{
+                                                                                                                {
 
   /* STM32F4xx HAL library initialization:
        - Configure the Flash prefetch, Flash preread and Buffer caches
@@ -119,9 +128,16 @@ int main(void)
   osKernelInitialize ();
 
   /* Create thread functions that start executing */
-  
+  initModJoy();
+  initModTemp(); //temperatura y hora
+  initModPOT();
+  Init_ModMP3();
+  initModLCD();
+//  Init_ThClock(); //este ya no existe
+  initModPWM();
+  initModRGB();
+  Init_ModCom();
   Init_ThPrincipal();                                                           //creo que este habrá qu eponerlo al final
-  Init_MsgQueue_Principal();                                                    //
 
   /* Start thread execution */
   osKernelStart();
