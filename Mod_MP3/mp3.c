@@ -17,13 +17,14 @@ void USART_Callback(uint32_t event);
 int Init_ThMP3(void);
 void MP3 (void *argument);
 int Init_MsgQueue_Mp3(void);
+int Init_MsgQueue_Mp3_Info(void);
 void MandarComando(uint8_t comm, uint8_t dato_1, uint8_t dato_2);
 uint8_t comprobarEstadoTarjeta();
 uint8_t getInfoMp3(uint8_t);
 //Hilo y cola:
 osThreadId_t tid_ThMp3;                        // thread id
 osMessageQueueId_t  mid_MsgQueueMp3;
-
+osMessageQueueId_t  mid_MsgQueueMp3Info;
 //Comandos
 
   uint8_t buffRx[10] = {0};
@@ -35,6 +36,7 @@ ARM_DRIVER_USART *USARTdrv2 = &Driver_USART2;
 void Init_ModMP3 (void){
   Init_ThMP3();
   Init_MsgQueue_Mp3();
+  Init_MsgQueue_Mp3_Info();
 }
 
 //Inicialización del hilo
@@ -57,6 +59,14 @@ int Init_MsgQueue_Mp3(void) {
   }
   return(0);
 }
+int Init_MsgQueue_Mp3_Info(void) {
+ 
+  mid_MsgQueueMp3Info= osMessageQueueNew(4,sizeof(t_respuesta), NULL);                                
+  if (mid_MsgQueueMp3Info == NULL) {
+    return (-1);
+  }
+  return(0);
+}
 
 
 //FUNCION DEL HILO
@@ -65,6 +75,8 @@ void MP3 (void *argument){
   uint8_t dato1;
   uint8_t dato2;
   t_comando msg;
+  t_respuesta msg_respuesta;
+  uint8_t estado_tarjeta = 0;
   //INICIALIZACION UART
   USARTdrv2->Initialize(USART_Callback);
   USARTdrv2->PowerControl(ARM_POWER_FULL);
@@ -74,79 +86,42 @@ void MP3 (void *argument){
   USARTdrv2->Control(ARM_USART_CONTROL_TX,1);
 
   //Inicializacion para elegir la tarjeta sd
-  comprobarEstadoTarjeta();
+
   MandarComando(9,0,2);
 
   osDelay(100);
   
   while(1){
-  comprobarEstadoTarjeta();
+
+    uint8_t nuevo_estado = comprobarEstadoTarjeta();
+    if(estado_tarjeta != nuevo_estado){
+      estado_tarjeta = nuevo_estado;
+      msg_respuesta.tipo = 0;
+      msg_respuesta.info = nuevo_estado;
+      osMessageQueuePut(mid_MsgQueueMp3Info, &msg_respuesta,0,0);
+    }
+
+  
+  
   if(osMessageQueueGet(mid_MsgQueueMp3,&msg,NULL,10U)==osOK){
-  com = msg.com;
-  dato1 = msg.dat1;
-  dato2 = msg.dat2;
-  MandarComando(com,dato1,dato2);
+  switch(msg.tipo){
+    case 0:
+     com = msg.com;
+     dato1 = msg.dat1;
+     dato2 = msg.dat2;
+     MandarComando(com,dato1,dato2);
+     break;
+
+    case 1:
+      msg_respuesta.tipo = msg.com;
+      msg_respuesta.info = getInfoMp3(msg.com);
+      osMessageQueuePut(mid_MsgQueueMp3Info, &msg_respuesta,0,0);
+      break;
+  }
+
   };
 
-  
-  
-//  switch(msg){
 
-//      case 0x01:
-//        comando(msg,0x00,0x00);//Siguiente cancion
-//      break;
-//      case 0x02:
-//        comando(msg,0x00,0x00);//Cancion anterior
-//      break;
-//      case 0x03:
-//        comando(msg,0x00,0x01);//Poner cancion con indice (el indice es el pasado en dato2)
-//      break;
-//      case 0x04:
-//        comando(msg,0x00,0x00);//Subir volumen
-//      break;
-//      case 0x05:
-//        comando(msg,0x00,0x00);//Bajar volumen
-//      break;
-//      case 0x06:
-//        comando(msg,0x00,0x1E);//Poner volumen al maximo 1E = volumen al 30 (maximo)
-//      break;
-//      case 0x08:
-//        comando(msg,0x00,0x01);//Poner la primera cancion
-//      break;
-//      case 0x09:
-//        comando(msg,0x00,0x02);//Seleccionar dispositivo de almacenamiento
-//      break;
-//      case 0x0A:
-//        comando(msg,0x00,0x00);//Sleep mode
-//      break;
-//      case 0x0B:
-//        comando(msg,0x00,0x00);//Despertar
-//      break;
-//      case 0x0C:
-//        comando(msg,0x00,0x00);//Reset
-//      break;
-//      case 0x0D:
-//        comando(msg,0x00,0x00);//Play
-//      break;
-//      case 0x0E:
-//        comando(msg,0x00,0x00);//Pausa
-//      break;
-//      case 0x0F:
-//        comando(msg,0x01,0x01);//Poner la cancion en el diorectorio /01/001.mp3
-//      break;
-//      case 0x16:
-//        comando(msg,0x00,0x00);//Parar
-//      break;
-//      case 0x17:
-//        comando(msg,0x01,0x02);//Reproducir carpeta 01
-//      break;
-//      case 0x19:
-//        comando(msg,0x00,0x00);//Empezar ciclo de reproduccion 0x01 para parar
-//      break;
-//    default:
-//      break;
-//  
-//  }
   }
 }
 
@@ -184,7 +159,7 @@ uint8_t getInfoMp3(uint8_t cmd){
   USARTdrv2->Send(buffCMD,sizeof(buffCMD));
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   
-  USARTdrv2->Receive(buffRx2,sizeof(buffRx));
+  USARTdrv2->Receive(buffRx2,sizeof(buffRx2));
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
 
    return  buffRx2[6];
