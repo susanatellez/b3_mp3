@@ -3,7 +3,7 @@
 #define __COM_H
 typedef struct{
   uint16_t longitud;
-  char mensaje[50];
+  char mensaje[75];
 }t_msgcom;
 void Init_ModCom (void);
 #endif

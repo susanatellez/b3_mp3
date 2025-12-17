@@ -37,6 +37,7 @@ extern osMessageQueueId_t mid_MsgQueueMp3Info;
 extern osMessageQueueId_t mid_MsgQueue_RGB;
 extern osMessageQueueId_t mid_MsgQueue_PWM;
 extern osMessageQueueId_t mid_MsgQueueCom;
+//extern osMessageQueueId_t mid_MsgQueueComRx;
 //COLAS DEL H-PRINCIPAL ASOCIADAS A LOS MÓDULOS
 uint8_t msgJoy = 0x00;
 uint8_t msgPot = 0x00;
@@ -65,7 +66,7 @@ uint8_t replyCurrentVolume;
 
 uint8_t finishedPlaying = 0;
 uint8_t playPause; //play 0 Pause 1
-
+uint8_t msgOrden;
 //Segundos del reloj
 extern uint32_t tiempo;
 uint32_t tiempo_mod;
@@ -115,7 +116,10 @@ void ThPrincipal (void *argument){
     // Si tampoco, probar TEMP
     else if (osMessageQueueGet(mid_MsgQueueTemp, &msgTemp, NULL, 10) == osOK) {
       evento = EV_TEMP;
-    }
+      }
+//    else if(osMessageQueueGet(mid_MsgQueueComRx, &msgOrden,NULL,10)== osOK){
+//      
+//    }
 
     if(osMessageQueueGet(mid_MsgQueueMp3Info,&msg_respuesta,NULL,10)== osOK){
       switch(msg_respuesta.tipo){
@@ -161,7 +165,7 @@ void ThPrincipal (void *argument){
     
       case MODO_REPOSO :                                                        //MODO REPOSO
           switch(evento){
-          case EV_JOY:
+          case EV_JOY :
             evento = 0x00; //borramos flag
             if(msgJoy == 0x50 && estadoSD > 1){
               
@@ -205,7 +209,7 @@ void ThPrincipal (void *argument){
             break;
             
           case EV_TEMP:
-          actualizarLCD_modoReposo ();
+          actualizarLCD_modoReposo();
           break;
           
           default: break;
@@ -373,8 +377,7 @@ void ThPrincipal (void *argument){
             msgMP3.dat2 = msgPot;
             osMessageQueuePut(mid_MsgQueueMp3, &msgMP3, 0, 0);
           
-          msgCom.longitud = sprintf(msgCom.mensaje,"%02d:%02d:%02d --> 7E FF 06 %02X 00 %02X %02X EF \r",tiempo / 3600,(tiempo % 3600) / 60,tiempo % 60,msgMP3.com, msgMP3.dat1, msgMP3.dat2);
-          osMessageQueuePut(mid_MsgQueueCom, &msgCom, 0, 0);
+
           
             actualizarLCD_modoReproduccion();
             break;
@@ -472,6 +475,8 @@ void actualizarLCD_modoReposo (void){
   msgLCD.linea = 2;
   sprintf(msgLCD.texto,"   %02d:%02d:%02d ",tiempo / 3600,(tiempo % 3600) / 60,tiempo % 60);
   osMessageQueuePut(mid_MsgQueueLCD, &msgLCD,0,0);
+   msgCom.longitud = sprintf(msgCom.mensaje,"---------------------\r SBM 2025   T:%.1fC\r   %02d:%02d:%02d \r",msgTemp,tiempo / 3600,(tiempo % 3600) / 60,tiempo % 60);
+  osMessageQueuePut(mid_MsgQueueCom, &msgCom, 0, 0);
 }
 
 void actualizarLCD_modoReproduccion (void){
@@ -480,11 +485,13 @@ void actualizarLCD_modoReproduccion (void){
   LCD_limpiarBuffer();
   msgLCD.modo = 2;
   msgLCD.linea = 0;
-  sprintf(msgLCD.texto, "F:%02d C:%02d      VOL:%02d", file, cancion, msgPot);
+  msgCom.longitud = sprintf(msgLCD.texto, "F:%02d C:%02d      VOL:%02d", file, cancion, msgPot);
   osMessageQueuePut(mid_MsgQueueLCD, &msgLCD, 0, 0);
   msgLCD.linea = 2;
-  sprintf(msgLCD.texto, "      T %02d:%02d  ", min, sec);
+  msgCom.longitud = sprintf(msgLCD.texto, "      T %02d:%02d  ", min, sec);
   osMessageQueuePut(mid_MsgQueueLCD, &msgLCD, 0, 0);
+  msgCom.longitud = sprintf(msgCom.mensaje,"---------------------\rF:%02d C:%02d      VOL:%02d\r      T %02d:%02d  \r",file, cancion, msgPot, min, sec);
+  osMessageQueuePut(mid_MsgQueueCom, &msgCom, 0, 0);
 }
 
 void actualizarLCD_modoHora(void){
@@ -496,14 +503,19 @@ void actualizarLCD_modoHora(void){
   msgLCD.linea = 2;
   if(var == 0 ){
       sprintf(msgLCD.texto,"   %02d:%02d:%02d  ",tiempo_mod / 3600,(tiempo_mod % 3600) / 60,tiempo_mod % 60);
+      msgCom.longitud = sprintf(msgCom.mensaje,"---------------------\r    HORA    T:%.1fC    \r    %02d:%02d:%02d\r          --\r",msgTemp,tiempo / 3600,(tiempo % 3600) / 60,tiempo % 60);
+      osMessageQueuePut(mid_MsgQueueCom, &msgCom, 0, 0);
   }else if(var == 1){
       sprintf(msgLCD.texto,"   %02d:%02d:%02d  ",tiempo_mod / 3600,(tiempo_mod % 3600) / 60,tiempo_mod % 60);
+    msgCom.longitud = sprintf(msgCom.mensaje,"---------------------\r    HORA    T:%.1fC    \r    %02d:%02d:%02d\r       --   \r",msgTemp,tiempo / 3600,(tiempo % 3600) / 60,tiempo % 60);
+      osMessageQueuePut(mid_MsgQueueCom, &msgCom, 0, 0);
   }else if(var == 2){
       sprintf(msgLCD.texto,"   %02d:%02d:%02d  ",tiempo_mod / 3600,(tiempo_mod % 3600) / 60,tiempo_mod % 60);
+    msgCom.longitud = sprintf(msgCom.mensaje,"---------------------\r    HORA    T:%.1fC    \r    %02d:%02d:%02d\r    --      \r",msgTemp,tiempo / 3600,(tiempo % 3600) / 60,tiempo % 60);
+      osMessageQueuePut(mid_MsgQueueCom, &msgCom, 0, 0);
   }
   osMessageQueuePut(mid_MsgQueueLCD, &msgLCD,0,0);
   
-  msgCom.longitud = sprintf(msgCom.mensaje,"-------------------------------------------------\r%02d:%02d:%02d --> 7E FF 06 %02X 00 %02X %02X EF \r",tiempo / 3600,(tiempo % 3600) / 60,tiempo % 60,msgMP3.com, msgMP3.dat1, msgMP3.dat2);
-  osMessageQueuePut(mid_MsgQueueCom, &msgCom, 0, 0);
+;
   
 }

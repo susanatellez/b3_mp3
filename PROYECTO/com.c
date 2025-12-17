@@ -9,23 +9,30 @@
  *---------------------------------------------------------------------------*/
  
 osThreadId_t tid_ThCom;                        // thread id
+osThreadId_t tid_ThComRx;
 osMessageQueueId_t  mid_MsgQueueCom;
-
+osMessageQueueId_t  mid_MsgQueueComRx;
 //DRIVER UART
 extern ARM_DRIVER_USART Driver_USART3;
 ARM_DRIVER_USART *USARTdrv = &Driver_USART3;
 void ComPC (void *argument);                   // thread function
+void ComPCRx (void *argument);
 int Init_MsgQueue_Com(void);
-
+int Init_MsgQueue_ComRx(void);
 int Init_ThCom(void);
+int Init_ThComRx(void);
 void USART_Callback_PC(uint32_t event);
+
+extern osMessageQueueId_t mid_MsgQueue_Joy;
 
 //Mensaje a enviar
 //char msg[32];
-
+  uint8_t orden[1];
 void Init_ModCom(void){
   Init_ThCom();
   Init_MsgQueue_Com();
+    Init_ThComRx();
+  Init_MsgQueue_ComRx();
 }
 
 //Inicialización del hilo 
@@ -38,6 +45,21 @@ int Init_ThCom (void) {
 
   tid_ThCom = osThreadNew(ComPC, NULL, &ThCom_attributes);
   if (tid_ThCom == NULL) {
+    return(-1);
+  }
+ 
+  return(0);
+}
+
+int Init_ThComRx (void) {
+
+  const osThreadAttr_t ThCom_attributes = {
+    .name = "ThComRx",
+    .stack_size = 256U, // <- Nuevo tamaño
+  };
+
+  tid_ThComRx = osThreadNew(ComPCRx, NULL, &ThCom_attributes);
+  if (tid_ThComRx == NULL) {
     return(-1);
   }
  
@@ -56,21 +78,36 @@ void ComPC (void *argument) {
   
   while (1) {
   if(osMessageQueueGet(mid_MsgQueueCom,&msg,NULL,10U)==osOK){
-  USARTdrv->Send(msg.mensaje,msg.longitud);
+  USARTdrv->Send(msg.mensaje,75);
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   }
    //osThreadYield();                            // suspend thread
   }
 }
 
+void ComPCRx(void *argument){
+uint8_t tecla;
+  while(1){
+  USARTdrv->Receive(orden,sizeof(orden));
+  osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
+  switch(orden[0]){
+    case 0x70:
+      tecla = 0x05;
+      osMessageQueuePut(mid_MsgQueue_Joy,&tecla,0,0);
+    break;
+  }
+  }
+}
 void USART_Callback_PC(uint32_t event){
   uint32_t mask;
-  mask = ARM_USART_EVENT_RECEIVE_COMPLETE | ARM_USART_EVENT_TRANSFER_COMPLETE|
+  mask =  ARM_USART_EVENT_TRANSFER_COMPLETE|
   ARM_USART_EVENT_SEND_COMPLETE | ARM_USART_EVENT_TX_COMPLETE;
   if (event & mask ){
     osThreadFlagsSet(tid_ThCom,0x01);
   }
-
+  if(event & ARM_USART_EVENT_RECEIVE_COMPLETE ){
+    osThreadFlagsSet(tid_ThComRx,0x01);
+  }
 }
 int Init_MsgQueue_Com(void) {
  
@@ -81,4 +118,12 @@ int Init_MsgQueue_Com(void) {
   return(0);
 }
 
+int Init_MsgQueue_ComRx(void) {
+ 
+  mid_MsgQueueComRx= osMessageQueueNew(4,sizeof(t_msgcom), NULL);                              
+  if (mid_MsgQueueComRx == NULL) {
+    return (-1);
+  }
+  return(0);
+}
 
