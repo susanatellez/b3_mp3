@@ -156,6 +156,11 @@ void ThRGB (void *argument){
           HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_11);                  //B
           osDelay(200); //5Hz
           break;
+        case 0x05:                                                              //ESTAS 5 LÍNEAS ///////////////////////////////////////////
+          HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);                  //R
+          HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);                  //G
+          HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_11);                  //B
+          break;
         default: break;
       }
 

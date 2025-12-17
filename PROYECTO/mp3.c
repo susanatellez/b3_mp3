@@ -49,6 +49,7 @@ uint8_t tracks_ini =0;
 uint8_t buffTx[8] = {0};  //MANDAR COMANDO
 uint8_t buffCMD[8] = {0}; //MANDA COMANDO ESPERANDO RESPUESTA
 uint8_t buffRx[10] = {0}; //RECIBE RESPUESTA
+uint8_t dataRX3;
 
 
 //Inicialización del módulo
@@ -158,6 +159,14 @@ void MP3_Recep(void *argument){
       msg_reply.tipo = 0;
       msg_reply.info = nuevo_estado;
       osMessageQueuePut(mid_MsgQueueMp3Info, &msg_reply,0,0);
+    } else if(estado_tarjeta == 3) {
+      if (dataRX3 != buffRx[6]){
+        dataRX3 = buffRx[6];
+        estado_tarjeta = nuevo_estado;
+        msg_reply.tipo = 0;
+        msg_reply.info = nuevo_estado;
+        osMessageQueuePut(mid_MsgQueueMp3Info, &msg_reply,0,0);
+      }
     }
   }
 }
@@ -205,6 +214,7 @@ uint8_t getInfoMp3(uint8_t cmd){                                                
 
 uint8_t comprobarEstadoTarjeta(){
   uint8_t estadoTarjeta = 1;
+  uint8_t dataRx;
   USARTdrv2->Receive(buffRx,sizeof(buffRx));
   osThreadFlagsWait(0x01, osFlagsWaitAny, osWaitForever);
   

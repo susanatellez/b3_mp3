@@ -109,23 +109,25 @@ void ThPWM (void *argument){
     
     if(estadoPWM == 0x02){ //PLAY
       HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
-      tim1.Init.Period = 999;
+      tim1.Init.Period = 499;
       HAL_TIM_OC_Init(&tim1);
       HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1);
       __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,300);
       osDelay(500);
-      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
+      //__HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
+      HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
       estadoPWM = 0x00;
     }
     
     if(estadoPWM == 0x03){ //PAUSE
       HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
-      tim1.Init.Period = 999;
+      tim1.Init.Period = 499;
       HAL_TIM_OC_Init(&tim1);
       HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1);
-      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,400);//antes en 550
+      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,480);//antes en 550
       osDelay(500);
-      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
+      //__HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
+      HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
       estadoPWM = 0x00;
     }
     

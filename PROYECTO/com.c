@@ -78,7 +78,7 @@ void ComPC (void *argument) {
   
   while (1) {
   if(osMessageQueueGet(mid_MsgQueueCom,&msg,NULL,10U)==osOK){
-  USARTdrv->Send(msg.mensaje,75);
+  USARTdrv->Send(msg.mensaje,msg.longitud);
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   }
    //osThreadYield();                            // suspend thread
@@ -91,8 +91,36 @@ uint8_t tecla;
   USARTdrv->Receive(orden,sizeof(orden));
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   switch(orden[0]){
-    case 0x70:
+    case 0x70://p
       tecla = 0x05;
+      osMessageQueuePut(mid_MsgQueue_Joy,&tecla,0,0);
+    break;
+    case 0x61://a
+      tecla = 0x04;
+      osMessageQueuePut(mid_MsgQueue_Joy,&tecla,0,0);
+    break;
+    case 0x64://d
+      tecla = 0x03;
+      osMessageQueuePut(mid_MsgQueue_Joy,&tecla,0,0);
+    break;
+    case 0x73:
+      tecla = 0x02;//s
+      osMessageQueuePut(mid_MsgQueue_Joy,&tecla,0,0);
+    break;
+    case 0x75:
+      tecla = 0x01;//u
+      osMessageQueuePut(mid_MsgQueue_Joy,&tecla,0,0);
+    break;
+    case 0x4D:
+      tecla = 0x50;//M
+      osMessageQueuePut(mid_MsgQueue_Joy,&tecla,0,0);
+    break;
+    case 0x53:
+      tecla = 0x20;//R
+      osMessageQueuePut(mid_MsgQueue_Joy,&tecla,0,0);
+    break;
+     case 0x41:
+      tecla = 0x40;//A
       osMessageQueuePut(mid_MsgQueue_Joy,&tecla,0,0);
     break;
   }

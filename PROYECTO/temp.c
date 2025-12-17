@@ -11,7 +11,7 @@ static ARM_DRIVER_I2C *I2Cdrv = &Driver_I2C1; //puntero que apunta al driver I2C
 void I2C_Callback(uint32_t eventId);
 void initI2C(void);
 
-int medirTemp(float *temp_c);
+float medirTemp();
 
 //Cabeceras y variables del hilo y la cola
 int Init_ThTemp(void);
@@ -74,8 +74,11 @@ int Init_ThTemp (void){
 }
 
 void Temp (void *argument){
+  float t_aux = 0;
   while(1){
-    if(medirTemp(&t) ==0){ //si ha medido la temperatura con éxito
+    t = medirTemp();
+    if(t != t_aux){
+      t_aux = t;
       osMessageQueuePut(mid_MsgQueueTemp,&t,0,0);
     }
     tiempo = (tiempo < 86399) ? tiempo+1 : 0;
@@ -83,8 +86,8 @@ void Temp (void *argument){
   }
 }
 
-int medirTemp (float *temp_c){
-
+float medirTemp(){
+  float temp_c = 0;
   //Buffer de lectura de temperatura,
   uint8_t buf[2]; //aquí se almacenarán los datos que vienen directamente del I2C
   int16_t temperatura; //reconstruir los datos de la Temperatura dados por el I2C
@@ -109,9 +112,9 @@ int medirTemp (float *temp_c){
   // Medida que entrega: 11 bits en complemento a 2, resolución 0.125 ºC
   temperatura = ((buf[0] << 8) | buf[1]); //Invierte los bytes recibidos, buf[0] mas significativos, buf[1] menos, los junta en 16 bits
   temperatura >>= 5;                      // Dejar 11 bits significativos (visto en el datasheet)
-  *temp_c = temperatura * 0.125f;         //Para redondear en sprintf a 1 decimal ("Temp = %.1f ºC\n", *temp_c);
+  temp_c = temperatura * 0.125f;         //Para redondear en sprintf a 1 decimal ("Temp = %.1f ºC\n", *temp_c);
 
-  return 0;
+  return temp_c;
 }
 
 //--------------------------------COLA------------------------------------------

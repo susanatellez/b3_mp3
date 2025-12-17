@@ -104,7 +104,7 @@ static void Error_Handler(void);
   * @retval None
   */
 int main(void)
-                                                                                                                {
+M                                                                                                                {
 
   /* STM32F4xx HAL library initialization:
        - Configure the Flash prefetch, Flash preread and Buffer caches
