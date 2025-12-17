@@ -56,7 +56,7 @@ void ComPC (void *argument) {
   
   while (1) {
   if(osMessageQueueGet(mid_MsgQueueCom,&msg,NULL,10U)==osOK){
-  USARTdrv->Send(msg.mensaje,50);
+  USARTdrv->Send(msg.mensaje,msg.longitud);
   osThreadFlagsWait(0x01, osFlagsWaitAny,osWaitForever);
   }
    //osThreadYield();                            // suspend thread

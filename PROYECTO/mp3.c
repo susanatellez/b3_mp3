@@ -2,7 +2,7 @@
 #include "mp3.h"
 #include "Driver_USART.h"
 #include <stdio.h>
-#include <string.h>
+#include <string.h> // para el memset
 #include "stm32f4xx.h"
 
 
@@ -34,6 +34,7 @@ int Init_MsgQueue_Mp3_Info(void);
 void MandarComando(uint8_t comm, uint8_t dato_1, uint8_t dato_2);
 uint8_t comprobarEstadoTarjeta();
 uint8_t getInfoMp3(uint8_t);
+void flushMp3Rx(void);
 
 
 //Comandos
@@ -41,7 +42,7 @@ uint32_t statusGet = 0;
 t_comando msg;              //mensaje que recibes
 t_respuesta msg_reply; //la que envias
 
-uint8_t estado_tarjeta = 0x01;
+uint8_t estado_tarjeta = 0x01; //Asumimos que Hay tarjta
 uint8_t fold_ini =0;
 uint8_t tracks_ini =0;
 
@@ -56,6 +57,7 @@ void Init_ModMP3 (void){
   Init_MsgQueue_Mp3_Info();
   Init_ThMP3();
   Init_ThMP3_Recep();
+
 }
 
 //Inicialización del hilo
@@ -94,7 +96,6 @@ int Init_MsgQueue_Mp3_Info(void) {
 
 //FUNCION DEL HILO
 void MP3 (void *argument){
-
 
   //INICIALIZACION UART
   USARTdrv2->Initialize(USART_Callback);

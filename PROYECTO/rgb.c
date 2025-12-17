@@ -12,6 +12,7 @@
 //#define RGB_PLAY  0x01 //VERDE
 //#define RGB_PAUSE 0x02 //AZUL
 //#define RGB_NO_SD 0x03 //ROJO
+//#define RGB_NO_SD 0x04 //ROSA RGB_CANCION_ACADABDA
 
 static GPIO_InitTypeDef GPIO_InitStruct;                                        //
 //void initModRGB (void);                                                       //está en el .H
@@ -147,6 +148,12 @@ void ThRGB (void *argument){
           HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);                                 //R
           HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);                  //G
           HAL_GPIO_WritePin(GPIOD, GPIO_PIN_11, GPIO_PIN_SET);                  //B
+          osDelay(200); //5Hz
+          break;
+        case 0x04: //ROSA RGB_CANCION_ACADABDA
+          HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);                  //R
+          HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);                  //G
+          HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_11);                  //B
           osDelay(200); //5Hz
           break;
         default: break;

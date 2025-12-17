@@ -8,10 +8,12 @@
  *      MODULO PWM OUTPUT: Módulo encargado de generar una señal PWM
 ********************************************************************************/
 
-//#define PWM_OFF   0x00
-//#define PWM_PLAY  0x01
-//#define PWM_PAUSE 0x02
-//#define PWM_NO_SD 0x03
+//#define PWM_OFF     0x00
+//#define PWM_NO_SD   0x01
+//#define PWM_PLAY    0x02
+//#define PWM_PAUSE   0x03
+//#define PWM_STOPPED 0x04
+
 
 static GPIO_InitTypeDef GPIO_InitStruct;                                        //están en
 //void initModPWM (void);                                                  //es como el initPIN_OUTPUT
@@ -88,32 +90,55 @@ void ThPWM (void *argument){
       estadoPWM = MsgQueue_PWM;
     }
     
-      if(estadoPWM == 0x00){
-          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);;
-      }
-      
-      if(estadoPWM == 0x01){
-          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,200);
-          osDelay(500);
-          __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
-        estadoPWM = 0x00;
-      }
-      
-      if(estadoPWM == 0x10){
-        __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,550);
-        osDelay(500);
-        __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
-        estadoPWM = 0x00;
-      }
-      
-      if(estadoPWM == 0x11){
-        __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,900);
-        osDelay(500);
-        __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
-        osDelay(500);
-      }
+    if(estadoPWM == 0x00){ //OFF
+      //me da igual el period pq no va a sonar
+      //__HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0); ///////////////////////////////
+      HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
+    }
     
-
+    if(estadoPWM == 0x01){ //NO_SD
+      HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
+      tim1.Init.Period = 999;
+      HAL_TIM_OC_Init(&tim1);
+      HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1);
+      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,900);
+      osDelay(500);
+      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
+      osDelay(500);
+    }
+    
+    if(estadoPWM == 0x02){ //PLAY
+      HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
+      tim1.Init.Period = 999;
+      HAL_TIM_OC_Init(&tim1);
+      HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1);
+      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,300);
+      osDelay(500);
+      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
+      estadoPWM = 0x00;
+    }
+    
+    if(estadoPWM == 0x03){ //PAUSE
+      HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
+      tim1.Init.Period = 999;
+      HAL_TIM_OC_Init(&tim1);
+      HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1);
+      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,400);//antes en 550
+      osDelay(500);
+      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
+      estadoPWM = 0x00;
+    }
+    
+//    if(estadoPWM == 0x04){ //STOPPED
+//      HAL_TIM_OC_Stop(&tim1, TIM_CHANNEL_1);
+//      tim1.Init.Period = 1999;
+//      HAL_TIM_OC_Init(&tim1);
+//      HAL_TIM_OC_Start(&tim1, TIM_CHANNEL_1);
+//      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,400);//antes en 550
+//      osDelay(500);
+//      __HAL_TIM_SET_COMPARE(&tim1,TIM_CHANNEL_1,0);
+//      estadoPWM = 0x00;
+//    }
   }
 }
 
@@ -125,8 +150,8 @@ void InitTimer1(void){
   __HAL_RCC_TIM1_CLK_ENABLE();                                                  //Habilitamos reloj del periférico del tIM2
   
   tim1.Instance = TIM1;                                                         //=¿con qué timer trabajaremos?
-  tim1.Init.Prescaler = 83;                                                    //(TIM1 clk = ) 168 MHz/ 840 =  Hz
-  tim1.Init.Period = 999;                                                        // 200 000 / 100 = 1kHz (arriba y abajo)
+  tim1.Init.Prescaler = 83;                                                     //(TIM1 clk = ) 168 MHz/ 84 =  Hz
+  tim1.Init.Period = 999;                                                       // 2000 000 / 200 = 10 000Hz (arriba y abajo) = 5kHzfreq
   tim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   HAL_TIM_PWM_Init(&tim1);                                                      //para mayor resolución te renta preescaler de 0 = 1 (pwm, input..)
   
